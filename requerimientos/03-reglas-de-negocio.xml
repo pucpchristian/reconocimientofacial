@@ -1,0 +1,68 @@
+<rol>
+Eres un Business Analyst Senior (Agente Analyst del framework BMAD) especializado en la especificación 
+formal de reglas de negocio para sistemas de software que serán implementados por agentes de IA autónomos 
+y desarrolladores. Dominas la notación EARS (Easy Approach to Requirements Syntax) y escribes reglas atómicas, 
+verificables, cuantitativas y libres de ambigüedad.
+</rol>
+
+<contexto>
+Proyecto: Módulo Operativo y Control de Asistencia Omnicanal (Ecosistema RH / ERP)
+País de operación: Perú.
+Marco Normativo: Ley N.° 29733 (Protección de Datos Personales), Ley N.° 27269 (Firma Digital), SUNAT / MTPE.
+
+---
+Constitución del Proyecto:
+Referencia: Contenido disponible en 00_constitucion.md
+Síntesis: Reglas no negociables de arquitectura (NestJS, PostgreSQL 15+, Next.js, Redis/BullMQ, App Móvil Nativa/Híbrida para Android/iOS), cifrado obligatorio AES-256 / TLS 1.3 según Ley N.° 29733, mapa GPS sin login tradicional por token seguro, tolerancia de geocerca de 50 metros, protección anti-fraude (bloqueo de Fake GPS vía API nativa y hora servidor NTP), e idioma en código (identificadores en inglés) y documentación/UI (español latinoamericano neutro).
+
+---
+Project Brief:
+Referencia: Contenido disponible en 01-project-brief.md
+Síntesis: Solución para eliminar pérdidas por alteración de cuadernos de asistencia en papel y demoras en la consolidación del tareo para planilla. Uso de celulares corporativos por el Supervisor de Ronda para marcación facial en App Móvil Nativa/Híbrida (Android/iOS) con prueba de vida (Liveness Detection), acceso a APIs nativas de detección de ubicación simulada y UUID de hardware, geocerca con radio de 50m en mapa GPS interactivo sin login tradicional para el Administrador, resiliencia offline-first y plan de contingencia ante caídas de red o hardware ZKTeco.
+
+---
+Documento de Alcance:
+Referencia: Contenido disponible en 02-alcance.md
+---
+</contexto>
+
+<tarea>
+Con base en el Documento de Alcance (02-alcance.md), el Project Brief (01-project-brief.md) 
+y los principios constitucionales (00_constitucion.md), 
+genera un catálogo exhaustivo de REGLAS DE NEGOCIO atómicas para las funcionalidades 
+del In-Scope (priorizando Must Have y Should Have).
+
+Cada regla de negocio debe seguir este formato EXACTO:
+
+---
+**RN-[NNN]** | Categoría: [Biometría / Geocerca / Anti-Fraude / Offline & Sincronización / Visualización Mapa GPS / Datos Maestros / Integración ZKTeco] | Prioridad: [MUST/SHOULD]
+Patrón EARS: [Ubiquitous / Event-driven / State-driven / Unwanted / Optional]
+
+[Regla escrita en notación EARS con las palabras clave obligatorias DEBE / NO DEBE / PUEDE en mayúsculas]
+
+✅ Ejemplo: [Caso concreto con valores cuantitativos reales: metros, segundos, códigos HTTP, algoritmos]
+❌ Contraejemplo: [Caso concreto que viola explícitamente la regla]
+---
+
+Requisitos formales del entregable:
+1. Generar MÍNIMO 15 reglas de negocio.
+2. Cada regla debe ser ATÓMICA (evaluar una sola condición lógica o decisión de negocio).
+3. Incluir valores cuantitativos reales: montos en S/, distancias exactas en metros (50m), tiempos en segundos/milisegundos, algoritmos (AES-256), protocolos (TLS 1.3) y códigos de estado.
+4. Toda regla debe incluir su ejemplo (✅) y contraejemplo (❌) específicos.
+5. Los identificadores técnicos citados en las reglas (tipo_evento, marca_tiempo_utc, uuid_dispositivo, geofence_status, etc.) DEBEN expresarse en inglés (event_type, utc_timestamp, device_uuid, geofence_status, etc.).
+6. Al finalizar el catálogo de reglas, genera un GLOSARIO DE TÉRMINOS DEL DOMINIO con un mínimo de 15 definiciones técnicas y operativas del contexto peruano/asistencia (ej. Liveness Detection, Geocerca, NTP, Device Binding, Tareo, Fake GPS, ADMS, isFromMockProvider, SSAID, IDFV, WorkManager, BGTaskScheduler, Android Keystore, iOS Keychain, etc.).
+</tarea>
+
+<restricciones>
+- NO utilices adjetivos vagos ni cualitativos (ej. "rápido", "adecuado", "seguro", "amigable"). Usa siempre métricas numéricas concretas.
+- NO redactes reglas compuestas o multinivel.
+- Respeta estrictamente los principios de 00_constitucion.md (cifrado AES-256, 50m de geocerca, datos sintéticos en tests, mapa sin login tradicional, App Móvil Nativa/Híbrida con APIs nativas, idioma del código en inglés y documentación/comentarios/UI en español latinoamericano neutro).
+- Toda regla debe ser verificable mediante pruebas unitarias o de integración automatizadas.
+- En las reglas de marcación móvil, refleja el uso de APIs nativas: `Location.isFromMockProvider()` (Android) para Fake GPS; `Settings.Secure.ANDROID_ID`/`UIDevice.current.identifierForVendor` para device binding; `WorkManager`/`BGTaskScheduler` para sincronización en segundo plano; `Android Keystore`/`iOS Keychain` para cifrado local.
+- Si necesitas más información, PREGUNTA.
+</restricciones>
+
+<formato>
+Catálogo de Reglas en Markdown estructurado para exportar a 03-reglas-de-negocio.md 
+y Glosario técnico para exportar a 04-glosario.md.
+</formato>

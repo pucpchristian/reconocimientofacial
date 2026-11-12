@@ -1,0 +1,106 @@
+<agente>
+Eres un Agente Consolidador de Validación del framework BMAD.
+Tu rol: tomar las observaciones de múltiples fuentes (revisión humana, agente reviewer, observaciones propias) y consolidarlas en un archivo 10-validation-log.md estructurado y priorizado.
+</agente>
+
+<documentos-relacionados>
+Este archivo XML (10-validation-log.xml) valida y mantiene trazabilidad bidireccional integral con todos los documentos del Spec Pack del proyecto "Módulo Operativo y Control de Asistencia Omnicanal (Ecosistema RH / ERP — Perú)":
+1. 00-constitucion.md (v2.2.2)
+2. 01-project-brief.md (v2.2.1)
+3. 02-alcance.md (v2.2.2)
+4. 03-reglas-de-negocio.md (v2.2.2)
+5. 04-glosario.md (v2.2.1)
+6. 05-auditoria-qa.md
+7. 06-historias-usuario.md
+8. 07-architecture.md (v1.0.0)
+9. 08-backlog.md
+10. 09-ui-spec.md
+</documentos-relacionados>
+
+<fuente-2-reporte-reviewer>
+# Reporte de Validación Cruzada del Spec Pack — Módulo Operativo y Control de Asistencia Omnicanal
+
+**Versión:** 2.2.2  
+**Proyecto:** Módulo Operativo y Control de Asistencia Omnicanal (Ecosistema RH / ERP - Perú)  
+**Alcance Validado:** Consistencia integral entre todos los documentos del Spec Pack, incluyendo la Arquitectura (07-architecture.md) y la Especificación de Interfaz (09-ui-spec.md).
+
+---
+
+## 1. Cobertura de Principios Constitucionales (`00-constitucion.md` v2.2.2)
+
+- **PRINCIPIO-001 (Idioma Estándar):** Cubierto en `01-project-brief.md`, `02-alcance.md`, `03-reglas-de-negocio.md` y `07-architecture.md`.
+- **PRINCIPIO-002 (Dashboard GPS sin Login Tradicional):** Cubierto en `02-alcance.md` (`M-05`), `03-reglas-de-negocio.md` y mapeado visualmente en `09-ui-spec.md` (P-004).
+- **PRINCIPIO-003 (Cifrado AES-256 / TLS 1.3 - Ley 29733):** Cubierto en `03-reglas-de-negocio.md` (`RN-009`) y en los Componentes Core de `07-architecture.md`.
+- **PRINCIPIO-004 (Integración ZKTeco):** Cubierto en `02-alcance.md` (`M-07`) y estructurado vía colas asíncronas en `07-architecture.md`.
+- **PRINCIPIO-005 (Marcación Facial Anti-Fraude):** Cubierto en `03-reglas-de-negocio.md` y reflejado en el UI Spec para P-002 (`09-ui-spec.md`).
+- **PRINCIPIO-006 (Operación Offline-First y Alerta al 80 %):** Cubierto en `02-alcance.md` (`M-04`) y `03-reglas-de-negocio.md` (`RN-021-A`).
+- **PRINCIPIO-007 (Restricciones IA):** Definido en `00-constitucion.md`.
+- **PRINCIPIO-008 (Suite E2E):** Cubierto en `02-alcance.md` (`RNF-007`).
+- **PRINCIPIO-009 (Auditabilidad Inmutable):** Cubierto en `03-reglas-de-negocio.md` (`RN-016`) y modelo de datos en `07-architecture.md`.
+- **PRINCIPIO-010 (Cumplimiento ARCO):** Cubierto en `03-reglas-de-negocio.md` (`RN-030`..`RN-037`) y enrolamiento en `09-ui-spec.md` (P-005).
+
+---
+
+## 2. Reglas de Negocio, Arquitectura y Especificación UI
+
+- **Cobertura Notación EARS:** El 100% de las 37 reglas base (RN-001A a RN-037) cumplen con la sintaxis universal (WHEN/IF... THEN... SHALL).
+- **Consistencia Arquitectónica:** El documento `07-architecture.md` define los servicios backend y flujos acordes a las prioridades M-01 a M-10 del Alcance.
+- **Trazabilidad UI:** `09-ui-spec.md` traza el 100% de las Historias de Usuario (HU-001..HU-026) y tareas de Frontend a las pantallas P-001 a P-007.
+- **Gap Identificado en UI Spec:** En `09-ui-spec.md` falta incorporar visualmente en el wireframe de P-003 la alerta roja parpadeante de saturación al 80% (4,000 registros), ya definida en `RN-021-A`.
+- **Gap Menor:** La cabecera de `03-reglas-de-negocio.md` mantiene `Versión: 2.2.1` a pesar de tener cambios recientes de la v2.2.2.
+
+---
+
+## 3. Flujo de Usuario y End-to-End
+
+- **Viabilidad del Flujo Principal:** El flujo detallado en `02-alcance.md` (Autenticación -> Marcación Offline -> Sync) está soportado estructuralmente por `07-architecture.md` y mapeado en los User Flows de `09-ui-spec.md`.
+- **Puntos de Fricción Documentales:** El Glosario (`04-glosario.md`) define estados como `PENDING_SYNC` (Término 27) pero omite referenciar explícitamente el umbral crítico del 80% (`RN-021-A`) que detona la alerta en UI.
+
+---
+
+## 4. Tabla de Observaciones y Gaps Documentales
+
+| # | Observación | Tipo | Severidad | Acción Sugerida | Requisito / RN Afectada | Archivo(s) `.md` Afectado(s) |
+|:-:|:---|:---|:---:|:---|:---:|:---|
+| 1 | Alerta de saturación local al 80 % no está reflejada en el wireframe de UI (P-003). | Gap Visual | **Alta** | Incorporar banner rojo parpadeante en P-003 de `09-ui-spec.md` cruzando con `RN-021-A`. | `PRINCIPIO-006.5` / `RN-021-A` | `09-ui-spec.md` |
+| 2 | Encabezado de documento desactualizado. | Consistencia | **Baja** | Actualizar `Versión: 2.2.1` a `2.2.2` en encabezado. | Metadatos | `03-reglas-de-negocio.md` |
+| 3 | Riesgo #2 de Project Brief y término #27 de Glosario no citan el umbral del 80%. | Consistencia | **Baja** | Añadir referencia cruzada a `RN-021-A` en Riesgo #2 y Término 27. | `M-04` / `RN-021-A` | `01-project-brief.md`, `04-glosario.md` |
+
+---
+
+## 5. Decisiones y Recomendaciones Requeridas
+
+1. **✅ APLICADA:** Incorporación de alerta al 80% (4,000 registros) en `00-constitucion.md` y `03-reglas-de-negocio.md`.
+2. **⏳ PENDIENTE:** Modificar P-003 en `09-ui-spec.md` para reflejar visualmente la saturación del 80% en banner rojo.
+3. **⏳ PENDIENTE:** Modificar encabezado de `03-reglas-de-negocio.md` a v2.2.2.
+4. **⏳ PENDIENTE:** Actualizar Riesgo #2 en `01-project-brief.md` y Término 27 en `04-glosario.md`.
+
+---
+
+## 6. Score de Completitud del Spec Pack
+
+- **Cobertura de Principios y Arquitectura:** 10/10 (100%)
+- **Cobertura de Prioridades MoSCoW en UI:** M-01 a M-10 cubiertas en P-001 a P-007 (100%).
+- **Estado de Aprobación:** **APROBADO CON OBSERVACIONES MENORES** (Apto para pase a codificación tras aplicar los cambios pendientes en `09-ui-spec.md`).
+</fuente-2-reporte-reviewer>
+
+<tarea>
+Consolida todas las observaciones en un archivo Markdown con:
+
+1. **Tabla de observaciones**: #, Observación, Fuente, Tipo, Severidad, Acción sugerida, HU/RN afectada.
+2. **Sección "Decisiones tomadas"**: ✅ APLICADA / ⏳ PENDIENTE / ⏳ BACKLOG (con T-XXX).
+3. **Sección "Archivos actualizados"**: qué archivos del Spec Pack se modificarían, incluyendo explícitamente 07-architecture.md y 09-ui-spec.md en la revisión general.
+
+Reglas:
+- Elimina duplicados: si el compañero y el agente encontraron lo mismo, combínalos.
+- Ordena por severidad: Alta primero, luego Media, luego Baja.
+- Cada observación debe tener acción concreta y HU/RN afectada.
+- Sugiere qué aplicar ahora (alta) y qué dejar para backlog.
+</tarea>
+
+<restricciones>
+- Formato Markdown del validation log (tabla + decisiones + archivos).
+- No inventes observaciones que no estén en las fuentes.
+- Mantén la trazabilidad a la fuente original.
+- Asegúrate de incluir Arquitectura (07) y UI Spec (09) en la matriz de impacto.
+</restricciones>

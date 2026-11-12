@@ -1,0 +1,85 @@
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla P-004 · Dashboard de Monitoreo GPS (Web) de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: P-004 · Dashboard de Monitoreo GPS (Web)
+ACTOR: Administrador de Operaciones
+HUs: HU-009, HU-018
+TAREAS BACKLOG: T-015
+PROPÓSITO: Visualizar en tiempo real las marcaciones en un mapa interactivo con perímetros de geocerca de 50 m mediante acceso directo por token firmado (sin login tradicional).
+
+WIREFRAME TEXTUAL:
++------------------------------------------------------------------------------+
+| [Logo] RH Omnicanal | Monitor GPS en Vivo      Sesión Token: Activa (11h 40m) |
++------------------------------------------------------------------------------+
+| Filtros: [ Sede: Todas v ] [ Fecha: 12/11/2026 ] [ Trabajador: Buscar...   ] |
+|          [ Estado: Todos / Fuera Geocerca ]                  [ 🔍 Filtrar ]  |
++-----------------------------------+------------------------------------------+
+| ALERTAS OPERATIVAS (2)            | MAPA INTERACTIVO (Leaflet / WGS84)       |
+| --------------------------------- |                                          |
+| 🔴 Juan Pérez - 08:02:15 UTC      |          . - ~ ~ ~ - .                   |
+|    Dist: 78.4 m (OUTSIDE_GEOFENCE)|        /   Radio 50m   \                 |
+|    Sede: Almacén Lurín            |       |   (📍 Sede)     |                |
+|    [ Ver en Mapa ]                |       |      🟢 Pin 1   |                |
+| --------------------------------- |        \               /                 |
+| 🔴 Luis Gómez - 08:05:40 UTC      |          ' - . _ . - '                   |
+|    Dist: 112.0 m                  |                     🔴 Pin 2 (78.4m)     |
+|    Sede: Planta Ate               |                                          |
+|    [ Ver en Mapa ]                |  [ + ] [ - ] Zoom | Capas: Satélite/Mapa |
++-----------------------------------+------------------------------------------+
+| Detalle Selección: Luis Gómez | DNI: ***45 | Precisión: 8m | Device: dev-98a |
++------------------------------------------------------------------------------+
+
+DATOS: TTL restante de session_token, listado de alertas OUTSIDE_GEOFENCE, coordenadas de sedes, pines de marcaciones (verde/rojo), círculos de radio 50 m, metadata de auditoría del pin seleccionado.
+ACCIONES: Filtrar por sede, fecha o trabajador; hacer clic en alerta para centrar mapa; hacer clic en pin para ver detalle y círculo de 50 m.
+ESTADOS: Cargando mapa (p95 <= 1.5s), Con datos (hasta 10,000 pines), Estado Vacío ('Sin marcaciones fuera de geocerca'), Token Expirado (>12h -> Pantalla HTTP 401 solicitando renovación por canal privilegiado).
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+RN-007: Acceso sin Login Tradicional
+El Dashboard DEBE permitir acceso mediante token de sesión firmado (vigencia máxima 12 h), sin formulario usuario/contraseña.
+
+RN-008: Renderizado de Geocerca y Pines
+CUANDO seleccione una marcación, DEBE renderizar círculo fijo de 50 m centrado en la sede y pin Verde (INSIDE_GEOFENCE) o Rojo (OUTSIDE_GEOFENCE).
+
+RN-013: Rendimiento de Filtrado
+CUANDO filtre por fechas, DEBE responder en p95 <= 1.5 s con hasta 10,000 marcaciones.
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

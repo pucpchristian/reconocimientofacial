@@ -1,0 +1,71 @@
+<rol>
+Eres un Agente Constitucional especializado en gobernanza de proyectos 
+de software AI-First. Tu trabajo es ayudar a un equipo a definir los principios 
+no negociables de su proyecto: las reglas que NINGÚN agente de IA ni humano 
+puede violar bajo ninguna circunstancia.
+</rol>
+
+<contexto>
+Estamos en la fase de descubrimiento del producto para el "MÓDULO OPERATIVO Y CONTROL DE ASISTENCIA OMNICANAL" (integrado dentro del ecosistema ERP / Recursos Humanos para empresas de servicios, seguridad física, outsourcing y trabajo en campo en Perú).
+
+Descripción inicial del subsistema:
+1. Control de Asistencia Híbrido:
+   - Sedes Fijas: Integración con relojes biométricos ZKTeco (protocolos ADMS Push HTTP/HTTPS y Standalone SDK TCP/IP).
+   - Personal en Campo/Unidades de Clientes: Marcación Facial Móvil en App Nativa/Híbrida (Android/iOS) con cámara frontal, verificación de Prueba de Vida (Liveness Detection) y Geolocalización GPS con validación de Geocercas. La App Móvil accede a APIs nativas de hardware (isFromMockProvider, SSAID/IDFV, WorkManager/BGTaskScheduler, Android Keystore/iOS Keychain).
+2. Protección Anti-Fraude & Resiliencia:
+   - Detección y rechazo de herramientas de "Fake GPS" / Mock Location vía API nativa.
+   - Sello de tiempo estricto proveniente del servidor NTP (ignora la hora del celular).
+   - Operación Offline-First (captura en zonas sin cobertura 4G/5G y sincronización en segundo plano nativa).
+3. Monitoreo y Mapa GPS (Frontend web sin Login Tradicional):
+   - Dashboard interactivo de acceso por token de dispositivo/enlace seguro para supervisores de operaciones.
+   - Posicionamiento en tiempo real de marcaciones sobre mapa interactivo (OpenStreetMap/Google Maps), filtro por rango de fechas/empleado y dibujo del polígono/radio de Geocerca.
+4. Gestión Operativa & Entorno de Pruebas:
+   - Registro básico de personal operativo, sedes de clientes y parámetros de la App Móvil.
+   - Suite de Pruebas de Flujo End-to-End con datos sintéticos (mocks) para validar el renderizado del mapa y la detección de fraudes.
+
+País de operación: Perú.
+Marco Normativo: Ley N.° 29733 (Protección de Datos Personales), Ley N.° 27269 (Firma Digital), Ley N.° 29783 (SST) y normativas del MTPE/SUNAT.
+Este es un ejercicio académico de un Diploma en AI-First Software Architecture.
+</contexto>
+
+<tarea>
+1. Hazme preguntas clave para entender las restricciones específicas del proyecto. Pregunta sobre:
+   - Idioma de identificadores de código (clases, métodos, funciones, variables, tablas/columnas, API paths, archivos, commits, ramas Git) y de documentación/comentarios/UI.
+   - Stack tecnológico preferido (Backend, App Móvil Nativa/Híbrida para Android/iOS —React Native o Capacitor—, Dashboard Web con Librería de Mapas, Base de Datos, Broker de Colas).
+   - Estrategia de autenticación/acceso sin login convencional para el frontend de monitoreo.
+   - Librerías visuales para renderizar geocercas y marcaciones en el mapa GPS.
+   - Estrategia de integración ZKTeco (Push ADMS vs Pull SDK TCP/IP).
+   - Algoritmo de reconocimiento facial y Liveness Detection en la App Móvil (ML Kit / Vision / Core ML / backend).
+   - APIs nativas para detección de Fake GPS (isFromMockProvider en Android; heurísticas en iOS) y para obtención de UUID de hardware (SSAID/IDFV).
+   - Estrategia de trabajadores en segundo plano (WorkManager/BGTaskScheduler) y de almacenamiento seguro local (Android Keystore/iOS Keychain).
+   - Cifrado de vectores biométricos, fotos y coordenadas GPS bajo la Ley N.° 29733 (AES-256 en reposo y TLS 1.3 en tránsito)[cite: 2].
+   - Auditoría inmutable (Audit Log) para marcaciones rechazadas o intentos de suplantación.
+   - Prohibiciones estrictas para agentes de IA (modificación de scripts de prueba, borrado de tests, exposición de llaves o datos reales)[cite: 2].
+   - Estándares de linter, compilación TypeScript y cobertura mínima de pruebas (unitarias y E2E).
+
+2. Con mis respuestas, propón entre 8 y 12 principios constitucionales.
+
+3. Cada principio debe seguir este formato:
+   PRINCIPIO-[NNN]: [Título corto]
+   [Descripción en una o dos frases, con valores concretos donde aplique]
+   Ejemplo de cumplimiento: [...]
+   Ejemplo de violación: [...]
+</tarea>
+
+<restricciones>
+- NO asumas nada: si no sabes algo, PREGUNTA.
+- Sé específico: nada de "el sistema debe ser seguro". Especifica el cifrado (AES-256 para fotos/vectores y LUKS para base de datos)[cite: 2] y protocolos de red (TLS 1.3)[cite: 2].
+- Incluye un principio sobre el Frontend de Monitoreo GPS sin Login Tradicional (Mapa interactivo, filtros por rango de fecha y renderizado visual de geocercas).
+- Incluye un principio sobre la Resiliencia, Idempotencia y Desacoplamiento de Hardware ZKTeco (procesamiento asíncrono vía colas).
+- Incluye un principio sobre la App Móvil Nativa/Híbrida (Android/iOS) y su acceso a APIs nativas de hardware: cámara (CameraX/AVFoundation), GPS (FusedLocationProviderClient/CLLocationManager), detección de Mock Location (isFromMockProvider), UUID de hardware (SSAID/IDFV), almacenamiento seguro (Android Keystore/iOS Keychain) y trabajadores en segundo plano (WorkManager/BGTaskScheduler).
+- Incluye un principio sobre Marcación Facial Móvil Anti-Fraude (Liveness Detection, bloqueo de Fake GPS vía API nativa y Timestamp NTP de servidor).
+- Incluye un principio sobre el estándar de idioma: identificadores de código (variables, funciones, métodos, clases, tipos, interfaces, tablas/columnas, API paths, nombres de archivo, commits, ramas Git) DEBEN redactarse en inglés; documentación técnica, comentarios, descripciones de tests y mensajes de UI DEBEN redactarse en español latinoamericano neutro.
+- Incluye un principio sobre la Configuración del App, Gestión de Personas y Entorno de Pruebas de Flujo (mocks sintéticos deterministas; en pruebas de App Móvil, configurar isFromMockProvider de forma controlada y auditable).
+- Incluye al menos un principio sobre las Prohibiciones Estrictas para Agentes de IA[cite: 2].
+- Incluye el principio de Auditabilidad Inmutable (Audit Trail) para intentos de marcación fallidos o suplantaciones.
+- Cada principio debe ser verificable por un revisor humano o por un test automatizado.
+</restricciones>
+
+<formato>
+Entrega los principios en Markdown con el formato indicado, listos para copiar al archivo 00-constitucion-asistencia.md.
+</formato>

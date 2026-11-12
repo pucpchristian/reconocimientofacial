@@ -1,0 +1,98 @@
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla P-002 · Marcación Facial Biométrica (Móvil) de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: P-002 · Marcación Facial Biométrica (Móvil)
+ACTOR: Supervisor de Ronda
+HUs: HU-001, HU-004, HU-005, HU-026
+TAREAS BACKLOG: T-003, T-004
+PROPÓSITO: Registrar la asistencia de un trabajador capturando su rostro con prueba de vida (Liveness Detection >= 0.95) y validando integridad del dispositivo.
+
+WIREFRAME TEXTUAL:
++--------------------------------------------------+
+| < Volver                 Marcación Biométrica    |
++--------------------------------------------------+
+| Trabajador: Carlos Mendoza (Operario)            |
+| DNI: *** - **** - 89 (Cifrado AES-256)           |
++--------------------------------------------------+
+|                                                  |
+|       [        Visor de Cámara Frontal       ]   |
+|       [            . - ~ ~ ~ - .             ]   |
+|       [          /   (o)   (o)   \           ]   |
+|       [         |        ^        |          ]   |
+|       [          \     \___/     /           ]   |
+|       [            ' - . _ . - '             ]   |
+|       [    Enfoque su rostro en el óvalo     ]   |
+|                                                  |
++--------------------------------------------------+
+| 🟢 Liveness Score: 0.97 (Óptimo >= 0.95)         |
+| Gesto Solicitado: PARPADEO DOBLE                 |
+| Tiempo restante: [ ■■■■■■■□□□ ] 3.2s / 5.0s      |
++--------------------------------------------------+
+| Progreso Consenso Anti-Fraude iOS (T-003):       |
+| [1. Velocidad] ✅ | [2. Salto] ✅ | [3. Prec.] ⏳ |
++--------------------------------------------------+
+| [           📸 CAPTURAR ASISTENCIA           ]   |
++--------------------------------------------------+
+| ⚠️ MODAL SEGURIDAD ROOT/JAILBREAK (Oculto T-004):|
+| +----------------------------------------------+ |
+| | 🛑 DISPOSITIVO COMPROMETIDO DETECTADO        | |
+| | Se detectó Root/Jailbreak. Operación bloqueada| |
+| | Código Diagnóstico: ERR-SEC-ROOT-422         | |
+| | [ 📞 Contactar Soporte Técnico ]             | |
+| +----------------------------------------------+ |
++--------------------------------------------------+
+
+DATOS: Nombre del trabajador, DNI enmascarado, stream de cámara frontal, liveness_score en tiempo real, tipo_gesto aleatorio, barra de progreso 5.0s, estado de 3 muestras anti-fraude iOS, código de diagnóstico de seguridad.
+ACCIONES: Enfocar rostro, ejecutar gesto en <= 5s, presionar 'Capturar Asistencia', abrir enlace de soporte si salta modal Root/Jailbreak.
+ESTADOS: Escaneando rostro, Gesto validado (botón activo), Tiempo excedido (>5s), Error Liveness (<0.95), Error Seguridad Root/Jailbreak (Modal bloqueante con código ERR-SEC-ROOT-422 - T-004), Consenso iOS incompleto (<2 señales -> derivación manual).
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+RN-001A / RN-001B: Prueba de Vida y Coincidencia
+CUANDO capture un rostro, DEBE exigir liveness_score >= 0.95 en <= 5.0 s con gesto enumerado (PARPADEO_DOBLE, etc.) y match_score >= 92.0%.
+
+RN-003-A / RN-003-A-6: Consenso Anti-Fraude iOS
+CUANDO ejecute en iOS, DEBE evaluar 3 muestras consecutivas (barra progreso T-003). Si < 2 señales son testeables, deriva a REQUIRES_MANUAL_APPROVAL.
+
+RN-003-B / RN-003-C: Detección Root/Jailbreak
+SI detecta root/jailbreak, DEBE rechazar con HTTP 422 y mostrar modal con código de diagnóstico (T-004).
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

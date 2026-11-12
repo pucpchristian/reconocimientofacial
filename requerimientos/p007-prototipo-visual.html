@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-007 · Exportación de Reportes Pre-Planilla (Web)</title>
+  <style>
+    
+:root {
+  --primary: #1E40AF;
+  --primary-hover: #1D4ED8;
+  --primary-light: #DBEAFE;
+  --secondary: #059669;
+  --secondary-light: #D1FAE5;
+  --accent: #D97706;
+  --accent-light: #FEF3C7;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --text-main: #111827;
+  --text-muted: #4B5563;
+  --border: #D1D5DB;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-shell {
+  width: 100%;
+  max-width: 412px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.desktop-shell {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.app-header {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.app-header .subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.content-pad {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.card-muted {
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: #FFFFFF;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #047857;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-outline {
+  background-color: #FFFFFF;
+  color: var(--text-main);
+  border: 1.5px solid var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #F3F4F6;
+}
+
+.btn-ghost-light {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: var(--secondary-light);
+  color: #065F46;
+}
+
+.badge-warning {
+  background: var(--accent-light);
+  color: #92400E;
+}
+
+.badge-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+}
+
+.badge-primary {
+  background: var(--primary-light);
+  color: #1E3A8A;
+}
+
+.small-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.input-control, .select-control {
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-main);
+  background: #FFFFFF;
+  width: 100%;
+}
+
+.input-control:focus, .select-control:focus {
+  outline: 3px solid rgba(30, 64, 175, 0.25);
+  border-color: var(--primary);
+}
+
+.qa-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: #1F2937;
+  color: #F9FAFB;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-top: auto;
+}
+
+.qa-panel.mobile-qa {
+  max-width: 412px;
+}
+
+.qa-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #93C5FD;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qa-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qa-btn {
+  background: #374151;
+  color: #F9FAFB;
+  border: 1px solid #4B5563;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+}
+
+.qa-btn:hover {
+  background: #4B5563;
+}
+
+.qa-btn.active {
+  background: var(--primary);
+  border-color: #60A5FA;
+}
+
+.toast {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast-success {
+  background: var(--secondary-light);
+  color: #065F46;
+  border: 1px solid #6EE7B7;
+}
+
+.toast-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
+.toast-warning {
+  background: var(--accent-light);
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.hidden {
+  display: none !important;
+}
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .kpi-card {
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .kpi-val {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .tareo-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .tareo-table th, .tareo-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .tareo-table th {
+      background: #F3F4F6;
+      font-weight: 700;
+    }
+    .immutable-box {
+      background: #ECFDF5;
+      border: 1.5px solid #6EE7B7;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="desktop-shell" aria-label="P-007 Exportación de Reportes Pre-Planilla">
+    <header class="app-header">
+      <div>
+        <h1>Consolidación de Tareo y Exportación Auditable (MTPE / SUNAT)</h1>
+        <div class="subtitle">P-007 · Pre-Planilla y Trazabilidad Inmutable (HU-019 / HU-020 / RN-016)</div>
+      </div>
+      <span class="badge badge-primary" style="font-size:13px; padding:6px 12px;">Tenant: CORP-PERU-01</span>
+    </header>
+
+    <div class="content-pad">
+      <!-- Barra de Periodo y Sede -->
+      <section class="card-muted" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; align-items:end;">
+        <div>
+          <label class="small-text" for="periodSelect">Periodo de Tareo (DD/MM/AAAA)</label>
+          <select id="periodSelect" class="select-control">
+            <option>01/11/2026 al 15/11/2026 (Quincena 1)</option>
+            <option>16/10/2026 al 31/10/2026 (Cerrado)</option>
+          </select>
+        </div>
+        <div>
+          <label class="small-text" for="tareoSiteSelect">Sede Operativa</label>
+          <select id="tareoSiteSelect" class="select-control" onchange="filterTareoTable()">
+            <option value="ALL">Todas las Sedes (240 Trabajadores)</option>
+            <option value="Planta Ate">Planta Industrial Ate</option>
+            <option value="Almacén Lurín">Almacén Lurín</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn btn-primary btn-full" onclick="recalculateTareo()">🔄 Calcular Consolidado</button>
+        </div>
+      </section>
+
+      <!-- Resumen KPIs -->
+      <section class="kpi-grid" aria-label="Resumen del periodo">
+        <div class="kpi-card">
+          <div class="small-text">Total Trabajadores</div>
+          <div class="kpi-val">240</div>
+        </div>
+        <div class="kpi-card">
+          <div class="small-text">Asistencias Validadas</div>
+          <div class="kpi-val" style="color:var(--secondary);">3,410</div>
+        </div>
+        <div class="kpi-card">
+          <div class="small-text">Faltas Explícitas (HU-019)</div>
+          <div class="kpi-val" style="color:var(--danger);">12</div>
+        </div>
+        <div class="kpi-card">
+          <div class="small-text">Excluidas (Aprob. Manual)</div>
+          <div class="kpi-val" style="color:var(--accent);">3</div>
+        </div>
+      </section>
+
+      <!-- Aviso Exclusión REQUIRES_MANUAL_APPROVAL (HU-019) -->
+      <div class="toast show toast-warning" role="note">
+        ⚠️ <strong>Aviso Operativo (HU-019):</strong> 3 marcaciones en estado <code>REQUIRES_MANUAL_APPROVAL</code> están excluidas automáticamente del consolidado hasta su aprobación por el Administrador.
+      </div>
+
+      <!-- Tabla Consolidada -->
+      <section class="card" style="overflow-x:auto; padding:0;">
+        <table class="tareo-table">
+          <thead>
+            <tr>
+              <th>DNI</th>
+              <th>Trabajador</th>
+              <th>Sede</th>
+              <th>Días Trab.</th>
+              <th>Faltas</th>
+              <th>Tardanzas</th>
+              <th>Sobretiempo</th>
+              <th>Bono Movilidad</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tareoTbody"></tbody>
+        </table>
+      </section>
+
+      <!-- Badge Verificación Inmutable (T-023 / RN-016 / RNF-010) -->
+      <section class="immutable-box" aria-label="Verificación de trazabilidad inmutable">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
+          <strong style="font-size:16px; color:#065F46;">
+            🛡️ Reporte con trazabilidad inmutable (Log Solo-Inserción · RN-016)
+          </strong>
+          <span class="badge badge-success">Badge Verificación · T-023</span>
+        </div>
+        <div style="font-family:monospace; font-size:12px; color:#047857; word-break:break-all;">
+          Hash de Integridad SHA-256: sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        </div>
+        <div class="small-text" style="color:#065F46;">
+          Incluye los 8 campos obligatorios (<code>event_id, worker_id, event_type, gps_coordinates, geofence_status, ip_address, device_info, utc_timestamp</code>) · Retención legal: 5 años (RNF-010).
+        </div>
+      </section>
+
+      <div id="p007Toast" class="toast" role="status"></div>
+
+      <!-- Botones Exportación -->
+      <div style="display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px;">
+        <button class="btn btn-outline" onclick="exportCsv()">📥 EXPORTAR CSV AUDITABLE</button>
+        <button class="btn btn-primary" onclick="exportPdf()">📑 EXPORTAR PDF (MTPE / SUNAT)</button>
+      </div>
+    </div>
+  </main>
+
+  <aside class="qa-panel">
+    <div class="qa-title">
+      <span>Panel QA · P-007 (Consolidación &amp; Exportación)</span>
+      <span>T-023 / HU-019 / HU-020 / RN-016</span>
+    </div>
+    <div class="qa-buttons">
+      <button class="qa-btn active" onclick="qaNormalView(this)">📊 Vista Consolidada</button>
+      <button class="qa-btn" onclick="qaTenantError(this)">🚫 Error Aislamiento Tenant (HTTP 403)</button>
+      <button class="qa-btn" onclick="exportCsv(this)">📥 Descargar CSV Real</button>
+    </div>
+  </aside>
+
+  <script>
+    const tareoRows = [
+      { dni: '45891234', name: 'María Torres', site: 'Planta Ate', days: 15, absences: 0, late: '00:00', overtime: '04:30', bonus: 'S/ 150.00', status: '✅ OK' },
+      { dni: '71234567', name: 'Juan Pérez', site: 'Almacén Lurín', days: 14, absences: 1, late: '00:25', overtime: '00:00', bonus: 'S/ 140.00', status: '⚠️ 1 Falta' },
+      { dni: '09876543', name: 'Carlos Mendoza', site: 'Planta Ate', days: 15, absences: 0, late: '00:05', overtime: '02:00', bonus: 'S/ 150.00', status: '✅ OK' },
+      { dni: '41223344', name: 'Ana Quispe', site: 'Almacén Lurín', days: 13, absences: 2, late: '00:00', overtime: '01:15', bonus: 'S/ 130.00', status: '⚠️ 2 Faltas' },
+      { dni: '76543210', name: 'Luis Gómez', site: 'Planta Ate', days: 15, absences: 0, late: '00:00', overtime: '06:00', bonus: 'S/ 150.00', status: '✅ OK' }
+    ];
+
+    function setActiveBtn(btn) {
+      document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function showToast(type, msg) {
+      const t = document.getElementById('p007Toast');
+      t.className = 'toast show toast-' + type;
+      t.textContent = msg;
+    }
+
+    function renderTable(rows) {
+      const tbody = document.getElementById('tareoTbody');
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td><strong>${r.dni}</strong></td>
+          <td>${r.name}</td>
+          <td>${r.site}</td>
+          <td>${r.days}</td>
+          <td style="color:${r.absences > 0 ? 'var(--danger)' : 'inherit'}; font-weight:${r.absences > 0 ? '700' : '400'};">${r.absences}</td>
+          <td>${r.late}</td>
+          <td>${r.overtime}</td>
+          <td>${r.bonus}</td>
+          <td><span class="badge ${r.absences > 0 ? 'badge-warning' : 'badge-success'}">${r.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function filterTareoTable() {
+      const site = document.getElementById('tareoSiteSelect').value;
+      const filtered = site === 'ALL' ? tareoRows : tareoRows.filter(r => r.site === site);
+      renderTable(filtered);
+    }
+
+    function recalculateTareo() {
+      showToast('success', '🔄 Consolidado recalculado en 1.8 s (<= 15 min) con formato monetario S/ y fechas DD/MM/AAAA.');
+    }
+
+    function exportCsv(btn) {
+      if (btn) setActiveBtn(btn);
+      const headers = ['DNI', 'Trabajador', 'Sede', 'Dias_Trabajados', 'Faltas', 'Tardanzas', 'Sobretiempo', 'Bono_Movilidad', 'Estado', 'Hash_Integridad_RN016'];
+      const hash = 'sha256:e3b0c44298fc1c149afbf4c8996fb924';
+      const csvLines = [
+        headers.join(','),
+        ...tareoRows.map(r => [r.dni, `"${r.name}"`, `"${r.site}"`, r.days, r.absences, r.late, r.overtime, `"${r.bonus}"`, `"${r.status}"`, hash].join(','))
+      ];
+      const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'reporte-tareo-auditable-01-15-nov-2026.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('success', '📥 Archivo CSV auditable descargado con los 8 campos obligatorios de RN-016.');
+    }
+
+    function exportPdf() {
+      showToast('success', '📑 PDF Auditable (MTPE/SUNAT) generado con firma SHA-256 y sello de tiempo NTP UTC.');
+    }
+
+    function qaNormalView(btn) {
+      setActiveBtn(btn);
+      document.getElementById('p007Toast').className = 'toast';
+      filterTareoTable();
+    }
+
+    function qaTenantError(btn) {
+      setActiveBtn(btn);
+      showToast('danger', 'HTTP 403 Forbidden (HU-020): Acceso denegado. No tiene permisos para exportar datos de otro tenant.');
+    }
+
+    renderTable(tareoRows);
+  </script>
+</body>
+</html>

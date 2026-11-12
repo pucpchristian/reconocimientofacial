@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-002 · Marcación Facial Biométrica (Móvil)</title>
+  <style>
+    
+:root {
+  --primary: #1E40AF;
+  --primary-hover: #1D4ED8;
+  --primary-light: #DBEAFE;
+  --secondary: #059669;
+  --secondary-light: #D1FAE5;
+  --accent: #D97706;
+  --accent-light: #FEF3C7;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --text-main: #111827;
+  --text-muted: #4B5563;
+  --border: #D1D5DB;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-shell {
+  width: 100%;
+  max-width: 412px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.desktop-shell {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.app-header {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.app-header .subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.content-pad {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.card-muted {
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: #FFFFFF;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #047857;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-outline {
+  background-color: #FFFFFF;
+  color: var(--text-main);
+  border: 1.5px solid var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #F3F4F6;
+}
+
+.btn-ghost-light {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: var(--secondary-light);
+  color: #065F46;
+}
+
+.badge-warning {
+  background: var(--accent-light);
+  color: #92400E;
+}
+
+.badge-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+}
+
+.badge-primary {
+  background: var(--primary-light);
+  color: #1E3A8A;
+}
+
+.small-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.input-control, .select-control {
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-main);
+  background: #FFFFFF;
+  width: 100%;
+}
+
+.input-control:focus, .select-control:focus {
+  outline: 3px solid rgba(30, 64, 175, 0.25);
+  border-color: var(--primary);
+}
+
+.qa-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: #1F2937;
+  color: #F9FAFB;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-top: auto;
+}
+
+.qa-panel.mobile-qa {
+  max-width: 412px;
+}
+
+.qa-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #93C5FD;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qa-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qa-btn {
+  background: #374151;
+  color: #F9FAFB;
+  border: 1px solid #4B5563;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+}
+
+.qa-btn:hover {
+  background: #4B5563;
+}
+
+.qa-btn.active {
+  background: var(--primary);
+  border-color: #60A5FA;
+}
+
+.toast {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast-success {
+  background: var(--secondary-light);
+  color: #065F46;
+  border: 1px solid #6EE7B7;
+}
+
+.toast-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
+.toast-warning {
+  background: var(--accent-light);
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.hidden {
+  display: none !important;
+}
+
+    .camera-box {
+      background: #111827;
+      border-radius: 16px;
+      padding: 20px 16px;
+      color: #FFFFFF;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 230px;
+      border: 3px solid var(--secondary);
+      transition: border-color 0.2s ease;
+    }
+    .camera-box.error-border {
+      border-color: var(--danger);
+    }
+    .face-oval {
+      width: 135px;
+      height: 170px;
+      border: 3px dashed #34D399;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .camera-box.error-border .face-oval {
+      border-color: #F87171;
+    }
+    .scan-line {
+      position: absolute;
+      width: 90%;
+      height: 2px;
+      background: #10B981;
+      top: 20%;
+      animation: scanMove 2.2s infinite alternate ease-in-out;
+    }
+    @keyframes scanMove {
+      from { top: 18%; }
+      to { top: 82%; }
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #E5E7EB;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 64%;
+      transition: width 0.2s linear, background-color 0.2s;
+    }
+    .ios-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .ios-step {
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.78);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+    .modal-card {
+      background: #FFFFFF;
+      max-width: 380px;
+      width: 100%;
+      border-radius: 16px;
+      border-top: 6px solid var(--danger);
+      padding: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+    }
+    .code-box {
+      background: #F3F4F6;
+      border: 1px dashed #9CA3AF;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--danger);
+      margin: 12px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="mobile-shell" aria-label="P-002 Marcación Facial Biométrica">
+    <header class="app-header">
+      <button class="btn-ghost-light" onclick="showFeedback('warning', 'Navegación simulada: Volviendo a selección de trabajador.')">&lt; Volver</button>
+      <div style="text-align: right;">
+        <h1>Marcación Biométrica</h1>
+        <div class="subtitle">P-002 · Asistencia Omnicanal</div>
+      </div>
+    </header>
+
+    <div class="content-pad">
+      <!-- Datos Trabajador -->
+      <section class="card-muted" aria-label="Datos del trabajador">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:700; font-size:16px;">Carlos Mendoza (Operario)</div>
+            <div class="small-text">DNI: *** - **** - 89 (Cifrado AES-256)</div>
+          </div>
+          <span class="badge badge-primary">M-01</span>
+        </div>
+      </section>
+
+      <!-- Visor de Cámara Frontal -->
+      <section id="cameraViewport" class="camera-box" aria-label="Visor de cámara frontal">
+        <div class="face-oval">
+          <div class="scan-line" id="scanLine"></div>
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+            <circle cx="12" cy="8" r="4"></circle>
+            <path d="M5 20c1.5-4 12.5-4 14 0"></path>
+          </svg>
+        </div>
+        <div id="cameraPrompt" style="font-size:13px; font-weight:600; text-align:center;">
+          Enfoque su rostro en el óvalo
+        </div>
+      </section>
+
+      <!-- Métricas Liveness & Temporizador Gesto (RN-001A) -->
+      <section class="card" aria-label="Validación de prueba de vida">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-weight:600; font-size:14px;">Liveness Score:</span>
+          <span id="livenessBadge" class="badge badge-success">🟢 0.97 (Óptimo &ge; 0.95)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+          <span>Gesto Solicitado:</span>
+          <strong id="gestureLabel" style="color:var(--primary);">PARPADEO_DOBLE</strong>
+        </div>
+        <div style="margin-top:8px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+            <span>Tiempo límite gesto (máx. 5.0s)</span>
+            <span id="timerLabel">3.2s / 5.0s</span>
+          </div>
+          <div class="progress-track">
+            <div id="gestureBar" class="progress-fill" style="width: 64%;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Progreso Consenso Anti-Fraude iOS (T-003 / RN-003-A) -->
+      <section class="card" aria-label="Progreso consenso anti-fraude iOS">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:700;">Progreso Anti-Fraude iOS (Consenso):</span>
+          <span class="badge badge-primary">T-003</span>
+        </div>
+        <div class="ios-steps" id="iosStepsContainer">
+          <div class="ios-step" id="step1">1. Velocidad ✅</div>
+          <div class="ios-step" id="step2">2. Salto ✅</div>
+          <div class="ios-step" id="step3">3. Precisión ⏳</div>
+        </div>
+        <div id="iosWarningNote" class="small-text hidden" style="color:var(--accent); margin-top:6px;">
+          ⚠️ &lt; 2 señales testeables (RN-003-A-6): Se derivará a REQUIRES_MANUAL_APPROVAL.
+        </div>
+      </section>
+
+      <!-- Feedback dinámico -->
+      <div id="feedbackToast" class="toast" role="status"></div>
+
+      <!-- Botón Principal -->
+      <button id="captureBtn" class="btn btn-primary btn-full" onclick="handleCapture()">
+        📸 CAPTURAR ASISTENCIA
+      </button>
+    </div>
+  </main>
+
+  <!-- Modal Seguridad Root / Jailbreak (T-004 / RN-003-B / RN-003-C) -->
+  <div id="rootModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="rootModalTitle">
+    <div class="modal-card">
+      <div style="display:flex; align-items:center; gap:8px; color:var(--danger); margin-bottom:8px;">
+        <span style="font-size:24px;">🛑</span>
+        <h2 id="rootModalTitle" style="font-size:18px; font-weight:700;">DISPOSITIVO COMPROMETIDO DETECTADO</h2>
+      </div>
+      <p style="font-size:14px; color:var(--text-main);">
+        Se detectaron indicadores de <strong>Root / Jailbreak</strong> (HTTP 422). Por seguridad (RN-003-B/C), la marcación biométrica está bloqueada en este terminal.
+      </p>
+      <div class="code-box">
+        <span>Código: ERR-SEC-ROOT-422</span>
+        <button class="btn-outline" style="min-height:32px; padding:4px 8px; font-size:12px;" onclick="copyDiagCode()">Copiar</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button class="btn btn-danger btn-full" onclick="alert('Abriendo canal de Soporte Técnico con código ERR-SEC-ROOT-422...')">
+          📞 Contactar Soporte Técnico
+        </button>
+        <button class="btn btn-outline btn-full" onclick="closeRootModal()">
+          Cerrar Simulación Modal (QA)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel QA -->
+  <aside class="qa-panel mobile-qa" aria-label="Panel de validación QA">
+    <div class="qa-title">
+      <span>Panel QA · P-002 (Biometría &amp; Seguridad)</span>
+      <span>Spec v2.2.2</span>
+    </div>
+    <div class="qa-buttons">
+      <button class="qa-btn active" onclick="setStateOptimal(this)">🟢 Óptimo (0.97)</button>
+      <button class="qa-btn" onclick="setStateLowLiveness(this)">🔴 Liveness Bajo (0.78)</button>
+      <button class="qa-btn" onclick="setStateTimeout(this)">⏱️ Timeout Gesto (&gt;5s)</button>
+      <button class="qa-btn" onclick="setStateIosFallback(this)">📱 iOS &lt;2 Señales</button>
+      <button class="qa-btn" onclick="openRootModal(this)">🛑 Modal Root (T-004)</button>
+    </div>
+  </aside>
+
+  <script>
+    let currentMode = 'optimal';
+    const gestures = ['PARPADEO_DOBLE', 'GUINO_IZQUIERDO', 'GUINO_DERECHO', 'INCLINACION_CABEZA'];
+    let gestureIdx = 0;
+
+    function setActiveBtn(btn) {
+      document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function showFeedback(type, msg) {
+      const el = document.getElementById('feedbackToast');
+      el.className = 'toast show toast-' + type;
+      el.textContent = msg;
+    }
+
+    function setStateOptimal(btn) {
+      setActiveBtn(btn);
+      currentMode = 'optimal';
+      closeRootModal();
+      document.getElementById('cameraViewport').classList.remove('error-border');
+      document.getElementById('cameraPrompt').textContent = 'Enfoque su rostro en el óvalo';
+      const badge = document.getElementById('livenessBadge');
+      badge.className = 'badge badge-success';
+      badge.textContent = '🟢 0.97 (Óptimo ≥ 0.95)';
+      gestureIdx = (gestureIdx + 1) % gestures.length;
+      document.getElementById('gestureLabel').textContent = gestures[gestureIdx];
+      document.getElementById('timerLabel').textContent = '3.2s / 5.0s';
+      const bar = document.getElementById('gestureBar');
+      bar.style.width = '64%';
+      bar.style.backgroundColor = 'var(--primary)';
+      document.getElementById('step1').textContent = '1. Velocidad ✅';
+      document.getElementById('step2').textContent = '2. Salto ✅';
+      document.getElementById('step3').textContent = '3. Precisión ✅';
+      document.getElementById('iosWarningNote').classList.add('hidden');
+      document.getElementById('captureBtn').disabled = false;
+      document.getElementById('feedbackToast').className = 'toast';
+    }
+
+    function setStateLowLiveness(btn) {
+      setActiveBtn(btn);
+      currentMode = 'low_liveness';
+      document.getElementById('cameraViewport').classList.add('error-border');
+      document.getElementById('cameraPrompt').textContent = '⚠️ Posible foto estática o baja iluminación';
+      const badge = document.getElementById('livenessBadge');
+      badge.className = 'badge badge-danger';
+      badge.textContent = '🔴 0.78 (Insuficiente < 0.95)';
+      document.getElementById('captureBtn').disabled = false;
+      showFeedback('danger', 'HTTP 422 · LIVENESS_FAILED: Prueba de vida insuficiente (RN-001A).');
+    }
+
+    function setStateTimeout(btn) {
+      setActiveBtn(btn);
+      currentMode = 'timeout';
+      document.getElementById('cameraViewport').classList.add('error-border');
+      document.getElementById('timerLabel').textContent = '5.0s / 5.0s (Excedido)';
+      const bar = document.getElementById('gestureBar');
+      bar.style.width = '100%';
+      bar.style.backgroundColor = 'var(--danger)';
+      document.getElementById('captureBtn').disabled = true;
+      showFeedback('danger', 'Tiempo de gesto excedido (> 5.0 s). Reinicie captura (HU-001).');
+    }
+
+    function setStateIosFallback(btn) {
+      setActiveBtn(btn);
+      currentMode = 'ios_fallback';
+      document.getElementById('cameraViewport').classList.remove('error-border');
+      const badge = document.getElementById('livenessBadge');
+      badge.className = 'badge badge-success';
+      badge.textContent = '🟢 0.96 (Óptimo ≥ 0.95)';
+      document.getElementById('step1').textContent = '1. Velocidad ✅';
+      document.getElementById('step2').textContent = '2. Salto N/A';
+      document.getElementById('step3').textContent = '3. BSSID N/A';
+      document.getElementById('iosWarningNote').classList.remove('hidden');
+      document.getElementById('captureBtn').disabled = false;
+      showFeedback('warning', 'Modo Zona Rural iOS: Solo 1 señal testeable. Se marcará como REQUIRES_MANUAL_APPROVAL.');
+    }
+
+    function openRootModal(btn) {
+      setActiveBtn(btn);
+      document.getElementById('rootModal').classList.remove('hidden');
+    }
+
+    function closeRootModal() {
+      document.getElementById('rootModal').classList.add('hidden');
+    }
+
+    function copyDiagCode() {
+      navigator.clipboard?.writeText('ERR-SEC-ROOT-422');
+      alert('Código ERR-SEC-ROOT-422 copiado al portapapeles.');
+    }
+
+    function handleCapture() {
+      if (currentMode === 'low_liveness') {
+        showFeedback('danger', 'Rechazado (HTTP 422): event_type = LIVENESS_FAILED. No cumple umbral >= 0.95.');
+        return;
+      }
+      if (currentMode === 'ios_fallback') {
+        showFeedback('warning', 'Captura guardada con estado REQUIRES_MANUAL_APPROVAL (RN-003-A-6). Notificado al Admin.');
+        return;
+      }
+      showFeedback('success', '✅ Marcación Biométrica Aprobada · match_score: 0.945 (≥ 0.92) · NTP UTC sincronizado.');
+    }
+  </script>
+</body>
+</html>

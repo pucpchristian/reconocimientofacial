@@ -1,0 +1,85 @@
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla P-006 · Binding de Dispositivo y Contingencias (Web/Móvil) de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: P-006 · Binding de Dispositivo y Contingencias (Web/Móvil)
+ACTOR: Administrador de Operaciones / Supervisor
+HUs: HU-012, HU-013, HU-014, HU-022
+TAREAS BACKLOG: T-018
+PROPÓSITO: Administrar la vinculación estricta de celulares corporativos (primario + backup), activar respaldos ante pérdida y emitir constancias de pérdida de asistencia.
+
+WIREFRAME TEXTUAL:
++------------------------------------------------------------------------------+
+| Seguridad de Terminales y Contingencia Operativa                             |
++------------------------------------------------------------------------------+
+| Supervisor: Roberto Silva (ID: SUP-042)                                      |
+| +-----------------------------------+  +-----------------------------------+ |
+| | DISPOSITIVO PRIMARIO              |  | DISPOSITIVO BACKUP (RESPALDO)     | |
+| | UUID: android-8841-99aa           |  | UUID: android-3310-77bb           | |
+| | Estado: 🟢 ACTIVO                 |  | Estado: 🟡 ENROLADO (INACTIVO)    | |
+| | [ 🚫 Revocar / Reportar Pérdida ] |  | [ ⚡ Activar Backup (OTP+Bio) ]   | |
+| +-----------------------------------+  +-----------------------------------+ |
++------------------------------------------------------------------------------+
+| Alertas de Contingencia Activas:                                             |
+| ⚠️ ZKTeco Sede Callao (SN: ZK-9901): BIOMETRICO_FUERA_DE_LINEA (>10 min)     |
+|    -> Contingencia Móvil PWA habilitada automáticamente para esta sede.      |
++------------------------------------------------------------------------------+
+| Gestión de Pérdida de Datos (DATA_LOST_DEVICE_LOST):                         |
+| Evento: Dispositivo android-1122 destruido el 11/11/2026 (14 marcas perdidas)|
+| Plazo legal emisión constancia: 36h 15m restantes (Máx 48h)                  |
+| [ 📄 GENERAR CONSTANCIAS DE PÉRDIDA (14 TRABAJADORES) ]                      |
++------------------------------------------------------------------------------+
+
+DATOS: primary_device_uuid, backup_device_uuid, estado de terminales, estado heartbeat de relojes ZKTeco, eventos DATA_LOST_DEVICE_LOST, contador regresivo de 48h para constancias.
+ACCIONES: Activar dispositivo backup (flujo OTP correo <= 2 min + biometría <= 5 min), revocar dispositivo perdido, generar constancias de pérdida masivas.
+ESTADOS: Operación Normal, Activando Backup (esperando OTP/Biometría), Contingencia ZKTeco Activa (BIOMETRICO_FUERA_DE_LINEA), Alerta Pérdida de Datos (pendiente de constancia <= 48h).
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+RN-012-A: Primario y Backup
+Cada supervisor DEBE tener 1 primary_device_uuid y 1 backup_device_uuid. Activación de backup requiere OTP al correo (<= 2 min) y biometría (<= 5 min).
+
+RN-012-C / RN-012-D: Pérdida de Datos y Constancia
+Datos en dispositivo revocado no son recuperables (crypto-shred). Administrador DEBE generar constancia de pérdida por trabajador afectado en <= 48 h.
+
+RN-018: Contingencia ZKTeco
+CUANDO un reloj ZKTeco pierda heartbeat > 10 min, cambia a BIOMETRICO_FUERA_DE_LINEA y habilita marcación móvil.
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

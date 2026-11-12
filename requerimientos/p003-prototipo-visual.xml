@@ -1,0 +1,90 @@
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla P-003 · Sincronización y Geocerca (Móvil) de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: P-003 · Sincronización y Geocerca (Móvil)
+ACTOR: Supervisor de Ronda
+HUs: HU-002, HU-003, HU-007, HU-008, HU-025
+TAREAS BACKLOG: T-010, T-011
+PROPÓSITO: Validar la ubicación GPS dentro de la geocerca de 50 m y gestionar la cola de sincronización Offline-First incluyendo alertas críticas de saturación al 80%.
+
+WIREFRAME TEXTUAL:
++--------------------------------------------------+
+| 🚨 ALERTA CRÍTICA DE SATURACIÓN (Parpadeante)    |
+| ⚠️ Almacenamiento local al 81 % (4,050/5,000)    |
+| Uso: 162 MB / 200 MB. Conéctese a red para sync. |
+| [ 🔄 FORZAR SINCRONIZACIÓN AHORA ]               |
++--------------------------------------------------+
+| < Volver             Validación de Geocerca      |
++--------------------------------------------------+
+| Sede: Planta Industrial Ate - Puerta 2           |
+| Coordenadas: -12.046374, -77.042793 (WGS84)      |
++--------------------------------------------------+
+| Estado GPS:                                      |
+| Precisión actual: 12 m (Óptimo <= 25 m)          |
+| Distancia al centroide: 34.2 m (Dentro de 50 m)  |
+| Estado: 🟢 INSIDE_GEOFENCE                       |
++--------------------------------------------------+
+| [ 🔄 RE-CAPTURAR GPS (Intento 1 de 3) ]          |
+| (Habilitado solo si precisión > 25 m)            |
++--------------------------------------------------+
+| Cola Offline (Banner Estándar Ámbar/Rojo):       |
+| 📦 4,050 marcaciones pendientes (PENDING_SYNC)   |
+| Última calibración NTP: Hace 2h 15m (Válida)     |
++--------------------------------------------------+
+| [      ✅ CONFIRMAR Y GUARDAR MARCACIÓN      ]   |
++--------------------------------------------------+
+
+DATOS: Nombre de sede, coordenadas WGS84, gps_accuracy en metros, distancia Haversine calculada, contador de re-capturas (máx 3), registros_pendientes, uso_disco_mb, porcentaje de saturación.
+ACCIONES: Re-capturar GPS (ventana 5s si accuracy > 25m), presionar 'Forzar Sincronización Ahora', confirmar marcación.
+ESTADOS: GPS Óptimo (<=25m, Dentro <=50m), Fuera de Geocerca (>50m), GPS Incierto (>25m, habilita hasta 3 re-capturas), Banner Ámbar (1..100 pendientes), Banner Rojo Parpadeante (>80% capacidad: >=4,000 registros o >=160 MB - T-010), Bloqueo 100% (5,000 registros).
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+RN-002 / RN-002-A / RN-017: Geocerca 50m y Re-captura
+DEBE calcular distancia Haversine (R=6,371,000m). Si gps_accuracy > 25m, permite máximo 3 re-capturas antes de derivar a REQUIRES_MANUAL_APPROVAL.
+
+RN-005 / RN-005-G: Offline-First y Banner Pendientes
+MIENTRAS no haya red, cifra localmente. Muestra banner ámbar (1..100) o rojo (>100 o >24h).
+
+RN-021-A: Alerta de Saturación al 80%
+MIENTRAS el almacenamiento supere 80% (4,000 registros o 160 MB), DEBE mostrar banner rojo parpadeante con conteo exacto y forzar sync si hay red (T-010).
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

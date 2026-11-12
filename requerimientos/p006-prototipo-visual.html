@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-006 · Binding de Dispositivo y Contingencias</title>
+  <style>
+    
+:root {
+  --primary: #1E40AF;
+  --primary-hover: #1D4ED8;
+  --primary-light: #DBEAFE;
+  --secondary: #059669;
+  --secondary-light: #D1FAE5;
+  --accent: #D97706;
+  --accent-light: #FEF3C7;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --text-main: #111827;
+  --text-muted: #4B5563;
+  --border: #D1D5DB;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-shell {
+  width: 100%;
+  max-width: 412px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.desktop-shell {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.app-header {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.app-header .subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.content-pad {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.card-muted {
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: #FFFFFF;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #047857;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-outline {
+  background-color: #FFFFFF;
+  color: var(--text-main);
+  border: 1.5px solid var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #F3F4F6;
+}
+
+.btn-ghost-light {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: var(--secondary-light);
+  color: #065F46;
+}
+
+.badge-warning {
+  background: var(--accent-light);
+  color: #92400E;
+}
+
+.badge-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+}
+
+.badge-primary {
+  background: var(--primary-light);
+  color: #1E3A8A;
+}
+
+.small-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.input-control, .select-control {
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-main);
+  background: #FFFFFF;
+  width: 100%;
+}
+
+.input-control:focus, .select-control:focus {
+  outline: 3px solid rgba(30, 64, 175, 0.25);
+  border-color: var(--primary);
+}
+
+.qa-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: #1F2937;
+  color: #F9FAFB;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-top: auto;
+}
+
+.qa-panel.mobile-qa {
+  max-width: 412px;
+}
+
+.qa-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #93C5FD;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qa-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qa-btn {
+  background: #374151;
+  color: #F9FAFB;
+  border: 1px solid #4B5563;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+}
+
+.qa-btn:hover {
+  background: #4B5563;
+}
+
+.qa-btn.active {
+  background: var(--primary);
+  border-color: #60A5FA;
+}
+
+.toast {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast-success {
+  background: var(--secondary-light);
+  color: #065F46;
+  border: 1px solid #6EE7B7;
+}
+
+.toast-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
+.toast-warning {
+  background: var(--accent-light);
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.hidden {
+  display: none !important;
+}
+
+    .devices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) {
+      .devices-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .device-card {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .device-card.active-dev {
+      border-color: var(--secondary);
+      background: #F0FDF4;
+    }
+    .contingency-box {
+      background: var(--accent-light);
+      border: 1.5px solid #F59E0B;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .contingency-box.online {
+      background: var(--secondary-light);
+      border-color: var(--secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <main class="desktop-shell" aria-label="P-006 Binding de Dispositivo y Contingencias">
+    <header class="app-header">
+      <div>
+        <h1>Seguridad de Terminales y Contingencia Operativa</h1>
+        <div class="subtitle">P-006 · Device Binding (RN-012-A..D) &amp; Contingencia ZKTeco (RN-018 / RN-022)</div>
+      </div>
+      <span class="badge badge-primary" style="font-size:13px; padding:6px 12px;">Supervisor: Roberto Silva (SUP-042)</span>
+    </header>
+
+    <div class="content-pad">
+      <!-- Terminales Primario + Backup (RN-012-A) -->
+      <section class="devices-grid" aria-label="Dispositivos vinculados">
+        <div id="primaryCard" class="device-card active-dev">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>📱 DISPOSITIVO PRIMARIO</strong>
+            <span id="primaryBadge" class="badge badge-success">🟢 ACTIVO</span>
+          </div>
+          <div class="small-text">UUID Hardware: <strong style="color:var(--text-main);">android-8841-99aa</strong></div>
+          <div class="small-text">Almacenamiento: Android Keystore (AES-256)</div>
+          <button id="revokePrimaryBtn" class="btn btn-danger btn-full" onclick="revokePrimary()">
+            🚫 Revocar / Reportar Pérdida
+          </button>
+        </div>
+
+        <div id="backupCard" class="device-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>📲 DISPOSITIVO BACKUP (RESPALDO)</strong>
+            <span id="backupBadge" class="badge badge-warning">🟡 ENROLADO (INACTIVO)</span>
+          </div>
+          <div class="small-text">UUID Hardware: <strong style="color:var(--text-main);">android-3310-77bb</strong></div>
+          <div class="small-text">Requisito activación: OTP Correo (&le;2m) + Biometría (&le;5m)</div>
+          <button id="activateBackupBtn" class="btn btn-primary btn-full" onclick="openBackupWizard()">
+            ⚡ Activar Backup (OTP + Biometría)
+          </button>
+        </div>
+      </section>
+
+      <!-- Wizard Activación Backup (Oculto por defecto) -->
+      <section id="backupWizard" class="card hidden" style="border:2px solid var(--primary); background:#EFF6FF;">
+        <h2 style="font-size:17px; color:var(--primary); margin-bottom:8px;">⚡ Activación de Dispositivo Backup (RN-012-A)</h2>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; align-items:end;">
+          <div>
+            <label class="small-text" for="otpInput">1. Código OTP enviado a r.silva@empresa.pe (&le; 2 min)</label>
+            <input id="otpInput" class="input-control" value="849201" />
+          </div>
+          <div>
+            <label class="small-text">2. Verificación Biométrica del Supervisor</label>
+            <button class="btn btn-secondary btn-full" onclick="completeBackupActivation()">👆 Validar Biometría y Activar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Alerta Contingencia ZKTeco (RN-018 / RN-022) -->
+      <section id="zkBox" class="contingency-box" aria-label="Estado de hardware ZKTeco">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+          <div>
+            <strong id="zkTitle" style="font-size:16px;">⚠️ ZKTeco Sede Callao (SN: ZK-9901): BIOMETRICO_FUERA_DE_LINEA (&gt; 10 min)</strong>
+            <div id="zkDesc" style="font-size:14px; margin-top:4px;">
+              Sin señal heartbeat al servidor ADMS. <strong>Contingencia Móvil PWA habilitada automáticamente</strong> para esta sede (RN-018).
+            </div>
+          </div>
+          <button id="zkToggleBtn" class="btn btn-outline" onclick="toggleZkHeartbeat()">
+            💓 Simular 3 Heartbeats (RN-022)
+          </button>
+        </div>
+      </section>
+
+      <!-- Gestión de Pérdida de Datos (RN-012-C / RN-012-D) -->
+      <section class="card" aria-label="Constancias de pérdida de datos">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <strong style="font-size:16px;">Gestión de Pérdida de Datos (DATA_LOST_DEVICE_LOST)</strong>
+              <span class="badge badge-danger">Plazo restante: 36h 15m (Máx. 48h)</span>
+            </div>
+            <p style="font-size:14px; color:var(--text-muted); margin-top:4px;">
+              Evento: Dispositivo <code>android-1122</code> destruido el 11/11/2026 (14 marcaciones locales no recuperables por crypto-shred).
+            </p>
+          </div>
+          <button id="constancyBtn" class="btn btn-primary" onclick="generateConstancies()">
+            📄 GENERAR CONSTANCIAS DE PÉRDIDA (14 TRABAJADORES)
+          </button>
+        </div>
+      </section>
+
+      <div id="p006Toast" class="toast" role="status"></div>
+    </div>
+  </main>
+
+  <aside class="qa-panel">
+    <div class="qa-title">
+      <span>Panel QA · P-006 (Binding &amp; Contingencias)</span>
+      <span>RN-012-A..D / RN-018 / RN-022</span>
+    </div>
+    <div class="qa-buttons">
+      <button class="qa-btn active" onclick="resetP006(this)">🔄 Estado Inicial</button>
+      <button class="qa-btn" onclick="openBackupWizard(this)">⚡ Flujo Activar Backup</button>
+      <button class="qa-btn" onclick="toggleZkHeartbeat(this)">💓 Alternar Heartbeat ZKTeco</button>
+      <button class="qa-btn" onclick="generateConstancies(this)">📄 Emitir Constancias 48h</button>
+    </div>
+  </aside>
+
+  <script>
+    let zkOnline = false;
+
+    function setActiveBtn(btn) {
+      document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function showToast(type, msg) {
+      const t = document.getElementById('p006Toast');
+      t.className = 'toast show toast-' + type;
+      t.textContent = msg;
+    }
+
+    function revokePrimary() {
+      document.getElementById('primaryCard').classList.remove('active-dev');
+      document.getElementById('primaryBadge').className = 'badge badge-danger';
+      document.getElementById('primaryBadge').textContent = '🔴 REVOCADO (Crypto-Shred)';
+      showToast('danger', 'Dispositivo primario revocado. Claves locales destruidas (DATA_LOST_DEVICE_LOST). Active el backup.');
+    }
+
+    function openBackupWizard(btn) {
+      if (btn) setActiveBtn(btn);
+      document.getElementById('backupWizard').classList.remove('hidden');
+    }
+
+    function completeBackupActivation() {
+      revokePrimary();
+      document.getElementById('backupWizard').classList.add('hidden');
+      document.getElementById('backupCard').classList.add('active-dev');
+      document.getElementById('backupBadge').className = 'badge badge-success';
+      document.getElementById('backupBadge').textContent = '🟢 ACTIVO (PRIMARIO)';
+      showToast('success', '✅ Dispositivo backup android-3310-77bb activado en 1m 40s (<= 5 min) con OTP + Biometría (RN-012-A).');
+    }
+
+    function toggleZkHeartbeat(btn) {
+      if (btn) setActiveBtn(btn);
+      zkOnline = !zkOnline;
+      const box = document.getElementById('zkBox');
+      if (zkOnline) {
+        box.classList.add('online');
+        document.getElementById('zkTitle').textContent = '🟢 ZKTeco Sede Callao (SN: ZK-9901): BIOMETRICO_EN_LINEA';
+        document.getElementById('zkDesc').textContent = '3 señales consecutivas de heartbeat recibidas. Canal biométrico primario restablecido (RN-022).';
+        document.getElementById('zkToggleBtn').textContent = '⚠️ Simular Caída >10 min';
+        showToast('success', 'Restablecimiento ZKTeco notificado al Administrador (RN-022).');
+      } else {
+        box.classList.remove('online');
+        document.getElementById('zkTitle').textContent = '⚠️ ZKTeco Sede Callao (SN: ZK-9901): BIOMETRICO_FUERA_DE_LINEA (> 10 min)';
+        document.getElementById('zkDesc').innerHTML = 'Sin señal heartbeat al servidor ADMS. <strong>Contingencia Móvil PWA habilitada automáticamente</strong> para esta sede (RN-018).';
+        document.getElementById('zkToggleBtn').textContent = '💓 Simular 3 Heartbeats (RN-022)';
+        showToast('warning', 'Contingencia PWA activada para Sede Callao (RN-018).');
+      }
+    }
+
+    function generateConstancies(btn) {
+      if (btn) setActiveBtn(btn);
+      const cBtn = document.getElementById('constancyBtn');
+      cBtn.textContent = '✅ 14 CONSTANCIAS EMITIDAS (ATTENDANCE_LOSS_CONSTANCY)';
+      cBtn.className = 'btn btn-secondary';
+      showToast('success', '📄 14 constancias emitidas dentro del plazo legal de 48h (RN-012-D) para respaldo de tareo.');
+    }
+
+    function resetP006(btn) {
+      setActiveBtn(btn);
+      document.getElementById('primaryCard').classList.add('active-dev');
+      document.getElementById('primaryBadge').className = 'badge badge-success';
+      document.getElementById('primaryBadge').textContent = '🟢 ACTIVO';
+      document.getElementById('backupCard').classList.remove('active-dev');
+      document.getElementById('backupBadge').className = 'badge badge-warning';
+      document.getElementById('backupBadge').textContent = '🟡 ENROLADO (INACTIVO)';
+      document.getElementById('backupWizard').classList.add('hidden');
+      document.getElementById('constancyBtn').textContent = '📄 GENERAR CONSTANCIAS DE PÉRDIDA (14 TRABAJADORES)';
+      document.getElementById('constancyBtn').className = 'btn btn-primary';
+      document.getElementById('p006Toast').className = 'toast';
+    }
+  </script>
+</body>
+</html>

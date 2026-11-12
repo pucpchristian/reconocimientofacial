@@ -1,0 +1,86 @@
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla P-007 · Exportación de Reportes Pre-Planilla (Web) de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: P-007 · Exportación de Reportes Pre-Planilla (Web)
+ACTOR: Analista de Planillas / Administrador
+HUs: HU-019, HU-020
+TAREAS BACKLOG: T-023
+PROPÓSITO: Consolidar el tareo operativo del periodo cerrado y exportar reportes auditables en CSV/PDF con verificación criptográfica de inmutabilidad.
+
+WIREFRAME TEXTUAL:
++------------------------------------------------------------------------------+
+| Consolidación de Tareo y Exportación Auditable (MTPE / SUNAT)                |
++------------------------------------------------------------------------------+
+| Periodo: [ 01/11/2026 al 15/11/2026 v ]   Sede: [ Todas v ]   [ 🔄 Calcular ]|
++------------------------------------------------------------------------------+
+| Resumen del Periodo:                                                         |
+| Total Trabajadores: 240 | Asistencias: 3,410 | Faltas: 12 | Pend. Aprob.: 3  |
+| ⚠️ Aviso: 3 marcaciones en REQUIRES_MANUAL_APPROVAL excluidas del cálculo.   |
++------------------------------------------------------------------------------+
+| DNI      | Trabajador      | Días Trab. | Tardanzas | Sobretiempo | Estado   |
+| ---------+-----------------+------------+-----------+-------------+--------- |
+| 45891234 | María Torres    | 15         | 00:00     | 04:30       | ✅ OK    |
+| 71234567 | Juan Pérez      | 14         | 00:25     | 00:00       | ⚠️ 1 Falta|
++------------------------------------------------------------------------------+
+| +--------------------------------------------------------------------------+ |
+| | 🛡️ Reporte con trazabilidad inmutable (Log Solo-Inserción - RN-016)      | |
+| |    Hash de Integridad: sha256:e3b0c44298fc1c149afbf4c8996fb924...        | |
+| |    Badge Verificación (T-023)                                            | |
+| +--------------------------------------------------------------------------+ |
+|                                    [ 📥 EXPORTAR CSV ]   [ 📑 EXPORTAR PDF ] |
++------------------------------------------------------------------------------+
+
+DATOS: Rango de fechas (DD/MM/AAAA), totales de asistencias, tardanzas, sobretiempos y faltas explícitas, alerta de marcaciones pendientes de aprobación manual, hash de integridad del log de auditoría.
+ACCIONES: Seleccionar periodo y sede, recalcular consolidado, descargar archivo CSV o PDF auditable.
+ESTADOS: Calculando consolidado (<= 15 min), Tabla con datos y advertencia de exclusión de REQUIRES_MANUAL_APPROVAL, Error aislamiento tenant (HTTP 403), Exportación exitosa con hash.
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+RN-016: Auditabilidad Inmutable
+TODA exportación del log DEBE incluir los 8 campos obligatorios (event_id, worker_id, event_type, gps_coordinates, geofence_status, ip_address, device_info, utc_timestamp).
+
+HU-019: Exclusión de Pendientes y Faltas Explícitas
+Marcaciones en REQUIRES_MANUAL_APPROVAL NO se incluyen hasta aprobarse. Días sin marcación se marcan explícitamente como faltas.
+
+RNF-010: Retención 5 Años
+Log de auditoría de solo inserción, sin modificación ni borrado.
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

@@ -1,0 +1,85 @@
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla P-001 · Autenticación del Supervisor (Móvil) de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: P-001 · Autenticación del Supervisor (Móvil)
+ACTOR: Supervisor de Ronda
+HUs: HU-016, HU-017
+TAREAS BACKLOG: T-001
+PROPÓSITO: Permitir la autenticación primaria del supervisor mediante PIN y biometría de plataforma al inicio de jornada, manejando bloqueos temporales por intentos fallidos.
+
+WIREFRAME TEXTUAL:
++--------------------------------------------------+
+| [Logo] Asistencia Omnicanal                      |
+| Control Operativo en Campo                       |
++--------------------------------------------------+
+| Dispositivo Vinculado:                           |
+| ID: dev-98a4-f21c (Autorizado)                   |
++--------------------------------------------------+
+| Ingresa tu PIN de Seguridad (6 dígitos):         |
+| [ * ] [ * ] [ * ] [ * ] [ * ] [ * ]              |
+|                                                  |
+| [      👆 VALIDAR CON HUELLA / FACE ID       ]   |
++--------------------------------------------------+
+| ⚠️ ESTADO DE BLOQUEO TEMPORAL (Oculto por def.): |
+| +----------------------------------------------+ |
+| | 🚫 TERMINAL BLOQUEADA POR SEGURIDAD          | |
+| | 3 intentos fallidos detectados.              | |
+| | Intente de nuevo en:  29:45  (MM:SS)         | |
+| +----------------------------------------------+ |
++--------------------------------------------------+
+| [         INICIAR JORNADA (Primary)          ]   |
++--------------------------------------------------+
+| Nota: Protección de datos bajo Ley N.° 29733.    |
++--------------------------------------------------+
+
+DATOS: device_uuid (enmascarado), inputs ocultos de PIN (6 dígitos), estado de sesión biométrica nativa, temporizador regresivo MM:SS (30 minutos).
+ACCIONES: Digitar PIN, pulsar validación biométrica nativa, presionar 'Iniciar Jornada'. En estado bloqueado, botones deshabilitados hasta llegar a 00:00.
+ESTADOS: Inicial (listo para PIN/Biometría), Validando (spinner), Error PIN (contador intentos), Bloqueado 30 min (banner rojo + temporizador MM:SS activo - T-001), Éxito (token TTL 12h emitido).
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+RN-012: Vinculación Secundaria
+MIENTRAS un Supervisor ejecute la App, la autenticación primaria (PIN + biometría) DEBE completarse antes de cualquier marcación.
+
+RN-014 / RN-014-A: Bloqueo Temporal de Terminal
+CUANDO se detecten 3 intentos fallidos consecutivos en 15 min, el sistema DEBE bloquear la terminal por 30 minutos mostrando temporizador regresivo MM:SS (T-001).
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

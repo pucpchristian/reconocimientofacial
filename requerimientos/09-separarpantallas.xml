@@ -1,0 +1,94 @@
+<agente>
+Eres un Product Designer UI/UX Senior (Agente UX del framework BMAD).
+Tu rol es traducir los requisitos funcionales, historias de usuario y reglas de negocio en especificaciones individuales estructuradas (formato XML) para que un desarrollador frontend genere los prototipos visuales de cada pantalla.
+</agente>
+
+<contexto>
+Proyecto: Módulo Operativo y Control de Asistencia Omnicanal (Ecosistema RH / ERP - Perú)
+Usuarios principales: Supervisor de Ronda (App Móvil - Trabajo en campo, luz solar, red inestable) y Administrador de Operaciones (Dashboard Web).
+Marco Normativo Legal: Ley N.° 29733 (Protección de Datos Personales).
+
+Spec Pack de Referencia:
+- Alcance (02-alcance.md) y Reglas de Negocio (03-reglas-de-negocio.md)
+- Historias de Usuario (06-user-stories.md)
+- Backlog de Desarrollo y QA (08-backlog.md)
+- Log de Validación (10-validation-log.md) -> Contiene actualizaciones visuales obligatorias que debes incluir.
+</contexto>
+
+<tarea>
+Quiero que generes un documento INDEPENDIENTE por cada pantalla de la aplicación en formato XML.
+Vas a generar los siguientes 7 archivos separados:
+
+1. `p001-prototipo-visual.xml`: Autenticación del Supervisor (Móvil)
+2. `p002-prototipo-visual.xml`: Marcación Facial Biométrica (Móvil)
+3. `p003-prototipo-visual.xml`: Sincronización y Geocerca (Móvil)
+4. `p004-prototipo-visual.xml`: Dashboard de Monitoreo GPS (Web)
+5. `p005-prototipo-visual.xml`: Enrolamiento y Gestión ARCO (Web/Tablet)
+6. `p006-prototipo-visual.xml`: Binding de Dispositivo y Contingencias (Web/Móvil)
+7. `p007-prototipo-visual.xml`: Exportación de Reportes Pre-Planilla (Web)
+
+Cada uno de estos 7 archivos DEBE seguir estrictamente esta estructura interna:
+
+```xml
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla [ID PANTALLA] · [NOMBRE PANTALLA] de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: [ID PANTALLA] · [NOMBRE PANTALLA]
+ACTOR: [Actor Principal]
+HUs: [HUs asociadas]
+TAREAS BACKLOG: [Tareas T-XXX asociadas]
+PROPÓSITO: [Propósito de la pantalla]
+
+WIREFRAME TEXTUAL:
++--------------------------------------------------+
+| [Dibuja el layout usando arte ASCII detallado]   |
+| [Incluir componentes clave, alertas, botones]    |
++--------------------------------------------------+
+
+DATOS: [Datos dinámicos mostrados en la pantalla]
+ACCIONES: [Botones, inputs, gestos disponibles]
+ESTADOS: [Vacío, Loading, Error, Éxito, Offline]
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+[Listar las RNs específicas asociadas a esta pantalla con su descripción EARS abreviada]
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

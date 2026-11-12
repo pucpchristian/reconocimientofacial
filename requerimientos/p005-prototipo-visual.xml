@@ -1,0 +1,86 @@
+<agente>
+Eres un desarrollador frontend senior. Tu trabajo es convertir un wireframe textual en un prototipo visual interactivo.
+</agente>
+
+<contexto>
+Estoy prototipando la pantalla P-005 · Enrolamiento y Gestión ARCO (Web/Tablet) de Módulo Operativo y Control de Asistencia Omnicanal.
+
+--- SCREEN SPEC ---
+PANTALLA: P-005 · Enrolamiento y Gestión ARCO (Web/Tablet)
+ACTOR: Administrador de Operaciones / DPO
+HUs: HU-010, HU-015, HU-023
+TAREAS BACKLOG: T-025
+PROPÓSITO: Enrolar trabajadores capturando su vector facial y consentimiento informado versionado, y gestionar solicitudes de derechos ARCO bajo la Ley N.° 29733.
+
+WIREFRAME TEXTUAL:
++------------------------------------------------------------------------------+
+| Gestión Biométrica y Cumplimiento Legal (Ley N.° 29733)                      |
+| [ Tab 1: Enrolamiento Trabajador ]   [ Tab 2: Solicitudes ARCO (2 Pend.) ]   |
++------------------------------------------------------------------------------+
+| Datos del Titular:                                                           |
+| DNI: [ 45891234 ]   Nombres: [ María Elena Torres ]   Sede: [ San Isidro v ] |
++------------------------------------------------------------------------------+
+| Captura Biométrica de Referencia:                                            |
+| +-----------------------------------+  +-----------------------------------+ |
+| | [  Vista Previa Foto Maestra   ]  |  | 🔒 Datos cifrados en reposo       | |
+| |                                   |  |    (Ley N.° 29733 - AES-256)      | |
+| | [ 📸 Capturar / Subir Foto ]      |  |    Badge Verificación (T-025)     | |
+| +-----------------------------------+  +-----------------------------------+ |
++------------------------------------------------------------------------------+
+| Consentimiento Informado (Política v2.2):                                    |
+| [x] El titular acepta el tratamiento de datos biométricos según Ley 29733.   |
+| Método Validación: (•) Firma Digital (Ley 27269)   ( ) Código OTP Correo     |
+| Hash generado: sha256:9f86d081884c7d659a2feaa0c55ad015...                    |
++------------------------------------------------------------------------------+
+| [ ❌ Cancelar ]                              [ ✅ GUARDAR ENROLAMIENTO ]     |
++------------------------------------------------------------------------------+
+
+DATOS: DNI, nombres, sede asignada, fotografía de referencia, privacy_policy_version, estado de checkbox consentimiento, consent_hash, listado de solicitudes ARCO (Acceso, Rectificación, Cancelación, Oposición).
+ACCIONES: Capturar foto maestra, marcar consentimiento, validar firma digital u OTP, guardar enrolamiento; en Tab ARCO: verificar identidad titular y ejecutar crypto-shredding.
+ESTADOS: Formulario incompleto (botón guardar deshabilitado -> HTTP 403 si falta consentimiento), Enrolado activo, Trabajador PENDING_CONSENT, Solicitud ARCO sin identidad verificada (HTTP 401), Cancelación ejecutada (clave revocada en KMS).
+
+--- DESIGN TOKENS ---
+PALETA DE COLORES:
+- Primario (#1E40AF): Azul corporativo
+- Secundario (#059669): Verde éxito / Aprobado
+- Acento (#D97706): Ámbar / Pendiente Sync
+- Peligro (#DC2626): Rojo alerta (Root, Liveness bajo, 80% Saturación)
+- Fondo (#F3F4F6): Gris claro para legibilidad en exteriores
+- Superficie (#FFFFFF): Blanco
+- Texto principal (#111827): Alto contraste WCAG 2.1 AA
+
+TIPOGRAFÍA: Inter, system-ui
+- Heading 1: 24px / Bold
+- Body: 16px / Regular
+- Small: 12px / Medium
+
+COMPONENTES:
+- Touch targets: >= 48px (usabilidad móvil con una mano)
+
+--- REGLAS DE NEGOCIO RELEVANTES ---
+RN-030 / RN-030-A: Consentimiento Versionado
+CUANDO se enrolle a un trabajador, DEBE capturar consentimiento con privacy_policy_version, timestamp, firma/OTP y consent_hash. Sin consentimiento rechaza HTTP 403.
+
+RN-033 / RN-033-B: Cancelación ARCO y Crypto-Shred
+A las 24 h de solicitud verificada, DEBE revocar inmediatamente la clave AES-256 en KMS y eliminar datos físicos a los 30 días.
+
+RN-037: Verificación de Identidad ARCO
+TODA solicitud ARCO DEBE verificar identidad del titular (firma digital o DNI + OTP + biometría) antes de procesarse.
+</contexto>
+
+<tarea>
+Genera un prototipo visual de esta pantalla como un artifact HTML/CSS/JS interactivo. Debe:
+1. Reflejar fielmente el wireframe textual (ASCII).
+2. Detallar componentes clave y estados.
+3. Ser responsive y touch-friendly (Mobile-first para P001-P003, Desktop para P004-P007).
+4. Usar los design tokens definidos.
+</tarea>
+
+<restricciones>
+- NO es código de producción: es un prototipo para validar con stakeholders.
+- Incorporar las validaciones de `10-validation-log.md` que apliquen a esta pantalla.
+- Usa Español Latinoamericano Neutro.
+- Priorizar claridad del flujo sobre pixel-perfection.
+- Incluir interacciones básicas (clics, navegación simulada, validaciones).
+- Si una sección depende de datos dinámicos, usar datos ficticios del caso.
+</restricciones>

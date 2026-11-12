@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-001 · Autenticación del Supervisor — Asistencia Omnicanal</title>
+
+  <!-- Fuente Inter según Design Tokens del Spec Pack -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN para utilidades responsivas y Design Tokens -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    /* Configuración de Design Tokens oficiales del proyecto */
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              primary: '#1E40AF',     /* Azul corporativo */
+              primaryHover: '#1E3A8A',
+              secondary: '#059669',   /* Verde éxito / Autorizado */
+              accent: '#D97706',      /* Ámbar advertencia */
+              danger: '#DC2626',      /* Rojo bloqueo / Peligro */
+              bg: '#F3F4F6',          /* Gris claro legibilidad en exteriores */
+              surface: '#FFFFFF',     /* Superficie tarjetas */
+              textMain: '#111827',    /* Texto principal WCAG 2.1 AA */
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Reglas base de accesibilidad y legibilidad en exteriores */
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #E5E7EB;
+      color: #111827;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Animación de sacudida ante PIN incorrecto */
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .animate-shake {
+      animation: shakeError 0.35s ease-in-out;
+    }
+
+    /* Animación de pulso suave para icono de bloqueo */
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.72; }
+    }
+
+    .animate-pulse-alert {
+      animation: pulseAlert 1.5s infinite ease-in-out;
+    }
+
+    /* Estilo de enmascaramiento para campos PIN cuando están ocultos */
+    .pin-masked {
+      -webkit-text-security: disc;
+      text-security: disc;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between py-4 px-3 sm:py-8 sm:px-4">
+
+  <!-- ===================================================================== -->
+  <!-- CONTENEDOR SMARTPHONE CENTRADO (MAX-WIDTH: 412px · MOBILE-FIRST)       -->
+  <!-- ===================================================================== -->
+  <main
+    id="smartphone-frame"
+    class="w-full max-w-[412px] bg-[#F3F4F6] rounded-[28px] shadow-2xl border-4 border-gray-800 overflow-hidden flex flex-col justify-between transition-all duration-200"
+    aria-label="Pantalla móvil P-001 Autenticación del Supervisor"
+  >
+    <!-- Barra de estado simulada del sistema móvil -->
+    <div class="bg-[#111827] text-white text-[11px] font-medium px-5 py-1.5 flex items-center justify-between select-none">
+      <span id="mobile-clock">08:00</span>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1 text-emerald-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          NTP Sync
+        </span>
+        <span>4G</span>
+        <span>94%</span>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VISTA 1: FORMULARIO DE AUTENTICACIÓN PRIMARIA (P-001)               -->
+    <!-- =================================================================== -->
+    <div id="view-login" class="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
+
+      <!-- 1. ENCABEZADO INSTITUCIONAL -->
+      <header class="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 flex items-center gap-3.5">
+        <!-- Logotipo institucional minimalista (SVG inline) -->
+        <div
+          class="w-12 h-12 rounded-xl bg-[#1E40AF] flex items-center justify-center shrink-0 shadow-sm"
+          aria-hidden="true"
+        >
+          <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-[24px] leading-tight font-bold text-[#111827] tracking-tight">
+            Asistencia Omnicanal
+          </h1>
+          <p class="text-sm font-medium text-gray-600 mt-0.5">
+            Control Operativo en Campo
+          </p>
+        </div>
+      </header>
+
+      <!-- 2. TARJETA DE DISPOSITIVO VINCULADO (RN-012) -->
+      <section
+        aria-label="Estado de vinculación del dispositivo"
+        class="bg-white rounded-2xl p-3.5 shadow-sm border border-gray-200 flex items-center justify-between gap-2"
+      >
+        <div class="min-w-0">
+          <p class="text-xs font-medium text-gray-600">Dispositivo Vinculado:</p>
+          <p class="text-sm font-bold text-[#111827] font-mono truncate mt-0.5">
+            ID: dev-98a4-f21c
+          </p>
+        </div>
+        <span
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-[#059669] text-white shrink-0 shadow-xs"
+        >
+          <span class="w-2 h-2 rounded-full bg-white"></span>
+          Autorizado
+        </span>
+      </section>
+
+      <!-- 4. BANNER DE ESTADO DE BLOQUEO TEMPORAL (T-001 / RN-014 / HU-017) -->
+      <!-- Oculto por defecto; visible automáticamente tras 3 intentos fallidos -->
+      <section
+        id="lockout-banner"
+        role="alert"
+        aria-live="assertive"
+        class="hidden bg-[#DC2626] text-white rounded-2xl p-4 shadow-md border-2 border-red-900 transition-all"
+      >
+        <div class="flex items-start gap-3">
+          <span class="text-2xl leading-none animate-pulse-alert select-none" aria-hidden="true">🚫</span>
+          <div class="flex-1 min-w-0">
+            <h2 class="text-sm font-bold tracking-wide uppercase">
+              TERMINAL BLOQUEADA POR SEGURIDAD
+            </h2>
+            <p class="text-xs font-medium text-red-100 mt-1">
+              3 intentos fallidos detectados.
+            </p>
+            <div class="mt-2.5 bg-red-950/60 rounded-xl px-3 py-2 flex items-center justify-between border border-red-400/30">
+              <span class="text-xs font-medium text-red-100">Intente de nuevo en:</span>
+              <span
+                id="lockout-timer"
+                class="text-lg font-bold font-mono tracking-wider text-white"
+              >
+                30:00
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Alerta dinámica de validación / intentos fallidos / desbloqueo -->
+      <div
+        id="feedback-alert"
+        role="status"
+        aria-live="polite"
+        class="hidden rounded-xl p-3 text-sm font-semibold border flex items-center gap-2.5 transition-all"
+      >
+        <span id="feedback-icon" aria-hidden="true">⚠️</span>
+        <span id="feedback-text" class="flex-1"></span>
+      </div>
+
+      <!-- 3. SECCIÓN DE AUTENTICACIÓN PRIMARIA (M-10 / HU-016) -->
+      <section
+        aria-label="Autenticación primaria del supervisor"
+        class="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 flex flex-col gap-4"
+      >
+        <!-- Bloque de 6 campos numéricos PIN -->
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2.5">
+            <label
+              for="pin-input-0"
+              class="text-sm font-semibold text-[#111827]"
+            >
+              Ingresa tu PIN de Seguridad (6 dígitos):
+            </label>
+            <button
+              type="button"
+              id="btn-toggle-pin"
+              class="text-xs font-semibold text-[#1E40AF] hover:underline px-2 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1E40AF]"
+              aria-label="Mostrar u ocultar dígitos del PIN"
+            >
+              Mostrar
+            </button>
+          </div>
+
+          <!-- Grid de 6 inputs táctiles (>= 48px alto, responsivos en 360px-412px) -->
+          <div
+            id="pin-container"
+            class="grid grid-cols-6 gap-1.5 sm:gap-2"
+            role="group"
+            aria-label="Campos numéricos de PIN de 6 dígitos"
+          >
+            <input
+              id="pin-input-0"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              autocomplete="one-time-code"
+              aria-label="Dígito 1 del PIN"
+              class="pin-box pin-masked w-full min-h-[48px] h-[52px] text-center text-xl font-bold text-[#111827] bg-[#F3F4F6] border-2 border-gray-300 rounded-xl focus:bg-white focus:border-[#1E40AF] focus:ring-2 focus:ring-[#1E40AF]/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <input
+              id="pin-input-1"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              aria-label="Dígito 2 del PIN"
+              class="pin-box pin-masked w-full min-h-[48px] h-[52px] text-center text-xl font-bold text-[#111827] bg-[#F3F4F6] border-2 border-gray-300 rounded-xl focus:bg-white focus:border-[#1E40AF] focus:ring-2 focus:ring-[#1E40AF]/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <input
+              id="pin-input-2"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              aria-label="Dígito 3 del PIN"
+              class="pin-box pin-masked w-full min-h-[48px] h-[52px] text-center text-xl font-bold text-[#111827] bg-[#F3F4F6] border-2 border-gray-300 rounded-xl focus:bg-white focus:border-[#1E40AF] focus:ring-2 focus:ring-[#1E40AF]/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <input
+              id="pin-input-3"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              aria-label="Dígito 4 del PIN"
+              class="pin-box pin-masked w-full min-h-[48px] h-[52px] text-center text-xl font-bold text-[#111827] bg-[#F3F4F6] border-2 border-gray-300 rounded-xl focus:bg-white focus:border-[#1E40AF] focus:ring-2 focus:ring-[#1E40AF]/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <input
+              id="pin-input-4"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              aria-label="Dígito 5 del PIN"
+              class="pin-box pin-masked w-full min-h-[48px] h-[52px] text-center text-xl font-bold text-[#111827] bg-[#F3F4F6] border-2 border-gray-300 rounded-xl focus:bg-white focus:border-[#1E40AF] focus:ring-2 focus:ring-[#1E40AF]/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <input
+              id="pin-input-5"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="1"
+              aria-label="Dígito 6 del PIN"
+              class="pin-box pin-masked w-full min-h-[48px] h-[52px] text-center text-xl font-bold text-[#111827] bg-[#F3F4F6] border-2 border-gray-300 rounded-xl focus:bg-white focus:border-[#1E40AF] focus:ring-2 focus:ring-[#1E40AF]/30 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
+        </div>
+
+        <!-- Botón secundario táctil de Biometría de Plataforma (>= 48px) -->
+        <button
+          type="button"
+          id="btn-biometric"
+          class="w-full min-h-[48px] px-4 py-3 rounded-xl font-semibold text-sm border-2 border-[#1E40AF] text-[#1E40AF] bg-blue-50/70 hover:bg-blue-100/80 active:scale-[0.99] flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-2 focus:ring-[#1E40AF] disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span id="biometric-btn-content" class="inline-flex items-center gap-2">
+            <span>👆 VALIDAR CON HUELLA / FACE ID</span>
+          </span>
+        </button>
+
+        <!-- 5. BOTÓN PRIMARIO: INICIAR JORNADA (>= 52px, #1E40AF) -->
+        <button
+          type="button"
+          id="btn-start-shift"
+          class="w-full min-h-[52px] px-5 py-3.5 rounded-xl font-bold text-base text-white bg-[#1E40AF] hover:bg-[#1E3A8A] active:scale-[0.99] shadow-md flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-4 focus:ring-[#1E40AF]/40 disabled:bg-gray-400 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          <span id="start-btn-content">INICIAR JORNADA</span>
+        </button>
+      </section>
+
+      <!-- 6. PIE DE PANTALLA (12px Medium · Ley N.° 29733) -->
+      <footer class="text-center px-2 pt-1 pb-2">
+        <p class="text-[12px] font-medium text-gray-700 flex items-center justify-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-[#059669] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>Nota: Protección de datos bajo Ley N.° 29733.</span>
+        </p>
+      </footer>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- VISTA 2: ESTADO DE ÉXITO (JORNADA INICIADA · TOKEN TTL 12H)         -->
+    <!-- =================================================================== -->
+    <div id="view-success" class="hidden p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 flex flex-col items-center text-center gap-3">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-[#059669] flex items-center justify-center text-3xl shadow-xs">
+          ✅
+        </div>
+        <div>
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#059669] text-white mb-2">
+            AUTENTICACIÓN PRIMARIA COMPLETADA
+          </span>
+          <h2 class="text-xl font-bold text-[#111827]">
+            Jornada Iniciada con Éxito
+          </h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Supervisor: <strong class="text-[#111827]">Roberto Silva</strong> · ID: <span class="font-mono">dev-98a4-f21c</span>
+          </p>
+        </div>
+
+        <!-- Detalles técnicos auditables (Token TTL 12h + NTP UTC) -->
+        <div class="w-full bg-[#F3F4F6] rounded-xl p-3.5 text-left border border-gray-200 space-y-2.5 mt-1">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-gray-600">
+                Session Token (TTL: 12h · RN-007 / HU-016)
+              </span>
+              <button
+                type="button"
+                id="btn-copy-token"
+                class="text-xs font-bold text-[#1E40AF] hover:underline px-1.5 py-0.5 rounded"
+              >
+                Copiar
+              </button>
+            </div>
+            <p
+              id="generated-token"
+              class="text-xs font-mono text-[#111827] bg-white p-2 rounded-lg border border-gray-200 mt-1 break-all select-all"
+            >
+              eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.sup042_dev98a4f21c.ttl12h
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1 border-t border-gray-200">
+            <div>
+              <span class="text-[11px] font-semibold text-gray-600 block">Sello NTP UTC (RN-004)</span>
+              <span id="generated-ntp" class="text-xs font-mono font-bold text-[#111827]">
+                2026-11-12T14:01:00Z
+              </span>
+            </div>
+            <div>
+              <span class="text-[11px] font-semibold text-gray-600 block">Almacenamiento Local</span>
+              <span class="text-xs font-bold text-[#059669]">
+                AES-256 Hardware OK
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notificación temporal al simular navegación a P-002 -->
+        <div
+          id="p002-transition-notice"
+          class="hidden w-full bg-blue-50 border border-[#1E40AF] text-[#1E40AF] rounded-xl p-3 text-xs font-semibold text-left"
+        >
+          🚀 Navegando a <strong>P-002 · Marcación Facial Biométrica</strong> con sesión activa...
+        </div>
+      </div>
+
+      <!-- Acciones de continuación -->
+      <div class="space-y-2.5">
+        <button
+          type="button"
+          id="btn-go-p002"
+          class="w-full min-h-[52px] px-5 py-3.5 rounded-xl font-bold text-base text-white bg-[#1E40AF] hover:bg-[#1E3A8A] active:scale-[0.99] shadow-md flex items-center justify-center gap-2 transition-all focus:outline-none focus:ring-4 focus:ring-[#1E40AF]/40"
+        >
+          <span>Continuar a Marcación Facial (P-002)</span>
+          <span aria-hidden="true">→</span>
+        </button>
+
+        <button
+          type="button"
+          id="btn-logout-reset"
+          class="w-full min-h-[48px] px-4 py-2.5 rounded-xl font-semibold text-sm text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-all"
+        >
+          Cerrar Sesión / Volver a P-001
+        </button>
+      </div>
+
+      <footer class="text-center px-2 pt-1 pb-2">
+        <p class="text-[12px] font-medium text-gray-700">
+          Nota: Protección de datos bajo Ley N.° 29733.
+        </p>
+      </footer>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- PANEL DE VALIDACIÓN PARA STAKEHOLDERS / QA (FUERA DE LA TARJETA MÓVIL)-->
+  <!-- ===================================================================== -->
+  <aside
+    aria-label="Panel de validación para Stakeholders y QA"
+    class="w-full max-w-3xl mt-6 bg-white rounded-2xl shadow-md border border-gray-300 p-4"
+  >
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-gray-200">
+      <div>
+        <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1E40AF]">
+          🛠️ Panel de Validación QA / Stakeholders · P-001
+        </span>
+        <p class="text-xs text-gray-600 mt-0.5">
+          Simulación interactiva de reglas de negocio (<strong>RN-012</strong>, <strong>RN-014</strong>, <strong>RN-014-A</strong>, <strong>T-001</strong>).
+        </p>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-[#111827] shrink-0">
+        PIN válido de prueba: <code class="font-mono font-bold text-[#1E40AF] text-sm">123456</code>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-3">
+      <button
+        type="button"
+        id="qa-reset"
+        class="min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-[#111827] border border-gray-300 transition-all"
+      >
+        Estado Inicial
+      </button>
+      <button
+        type="button"
+        id="qa-fail-pin"
+        class="min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-900 border border-[#D97706] transition-all"
+      >
+        Simular Fallo PIN
+      </button>
+      <button
+        type="button"
+        id="qa-lock-30"
+        class="min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-900 border border-[#DC2626] transition-all"
+      >
+        Activar Bloqueo 30:00 (T-001)
+      </button>
+      <button
+        type="button"
+        id="qa-fast-forward"
+        class="min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-400 transition-all"
+      >
+        Adelantar Reloj a 00:05
+      </button>
+      <button
+        type="button"
+        id="qa-success"
+        class="col-span-2 sm:col-span-1 min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-[#059669] transition-all"
+      >
+        Simular Acceso Exitoso
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================================================================== -->
+  <!-- LÓGICA DE INTERACCIÓN, VALIDACIÓN Y TEMPORIZADOR EN VIVO              -->
+  <!-- ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* Constantes de Reglas de Negocio (RN-014, HU-016) */
+      const VALID_PIN = '123456';
+      const MAX_ATTEMPTS = 3;
+      const LOCKOUT_DURATION_SECONDS = 30 * 60; // 30 minutos = 1800 segundos
+
+      /* Estado de la pantalla P-001 */
+      const state = {
+        failedAttempts: 0,
+        biometricVerified: false,
+        isLocked: false,
+        remainingSeconds: 0,
+        timerInterval: null,
+        pinVisible: false,
+        isSubmitting: false
+      };
+
+      /* Referencias DOM */
+      const pinInputs = Array.from(document.querySelectorAll('.pin-box'));
+      const pinContainer = document.getElementById('pin-container');
+      const btnTogglePin = document.getElementById('btn-toggle-pin');
+      const btnBiometric = document.getElementById('btn-biometric');
+      const biometricBtnContent = document.getElementById('biometric-btn-content');
+      const btnStartShift = document.getElementById('btn-start-shift');
+      const startBtnContent = document.getElementById('start-btn-content');
+
+      const lockoutBanner = document.getElementById('lockout-banner');
+      const lockoutTimerEl = document.getElementById('lockout-timer');
+      const feedbackAlert = document.getElementById('feedback-alert');
+      const feedbackIcon = document.getElementById('feedback-icon');
+      const feedbackText = document.getElementById('feedback-text');
+
+      const viewLogin = document.getElementById('view-login');
+      const viewSuccess = document.getElementById('view-success');
+      const generatedNtpEl = document.getElementById('generated-ntp');
+      const generatedTokenEl = document.getElementById('generated-token');
+      const p002TransitionNotice = document.getElementById('p002-transition-notice');
+
+      /* Actualiza el reloj de la barra superior del smartphone */
+      function updateMobileClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const clockEl = document.getElementById('mobile-clock');
+        if (clockEl) {
+          clockEl.textContent = `${hours}:${minutes}`;
+        }
+      }
+      updateMobileClock();
+      setInterval(updateMobileClock, 15000);
+
+      /* Formatea segundos totales a MM:SS */
+      function formatMMSS(totalSeconds) {
+        const safeSeconds = Math.max(0, totalSeconds);
+        const mins = Math.floor(safeSeconds / 60);
+        const secs = safeSeconds % 60;
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+
+      /* Muestra alerta contextual (ámbar, rojo o verde) sin usar alert() */
+      function showFeedback(type, message) {
+        feedbackAlert.classList.remove(
+          'hidden',
+          'bg-amber-50', 'border-[#D97706]', 'text-amber-950',
+          'bg-red-50', 'border-[#DC2626]', 'text-red-950',
+          'bg-emerald-50', 'border-[#059669]', 'text-emerald-950'
+        );
+
+        if (type === 'warning') {
+          feedbackIcon.textContent = '⚠️';
+          feedbackAlert.classList.add('bg-amber-50', 'border-[#D97706]', 'text-amber-950');
+        } else if (type === 'error') {
+          feedbackIcon.textContent = '❌';
+          feedbackAlert.classList.add('bg-red-50', 'border-[#DC2626]', 'text-red-950');
+        } else if (type === 'success') {
+          feedbackIcon.textContent = '✅';
+          feedbackAlert.classList.add('bg-emerald-50', 'border-[#059669]', 'text-emerald-950');
+        }
+
+        feedbackText.textContent = message;
+      }
+
+      function hideFeedback() {
+        feedbackAlert.classList.add('hidden');
+      }
+
+      /* Obtiene el valor concatenado de los 6 inputs del PIN */
+      function getPinValue() {
+        return pinInputs.map(input => input.value.trim()).join('');
+      }
+
+      /* Limpia todos los campos del PIN */
+      function clearPinInputs(focusFirst = true) {
+        pinInputs.forEach(input => {
+          input.value = '';
+        });
+        if (focusFirst && !state.isLocked) {
+          pinInputs[0].focus();
+        }
+      }
+
+      /* Activa animación visual de error en los inputs de PIN */
+      function triggerPinShake() {
+        pinContainer.classList.remove('animate-shake');
+        void pinContainer.offsetWidth; // Fuerza reflow
+        pinContainer.classList.add('animate-shake');
+      }
+
+      /* Habilita o deshabilita todos los controles interactivos durante el bloqueo */
+      function setControlsDisabled(disabled) {
+        pinInputs.forEach(input => {
+          input.disabled = disabled;
+        });
+        btnTogglePin.disabled = disabled;
+        btnBiometric.disabled = disabled;
+        btnStartShift.disabled = disabled;
+      }
+
+      /* Inicia el bloqueo temporal de 30 minutos (T-001 / RN-014) */
+      function activateLockout(seconds = LOCKOUT_DURATION_SECONDS) {
+        if (state.timerInterval) {
+          clearInterval(state.timerInterval);
+        }
+
+        state.isLocked = true;
+        state.failedAttempts = MAX_ATTEMPTS;
+        state.remainingSeconds = seconds;
+
+        hideFeedback();
+        clearPinInputs(false);
+        setControlsDisabled(true);
+
+        lockoutTimerEl.textContent = formatMMSS(state.remainingSeconds);
+        lockoutBanner.classList.remove('hidden');
+
+        state.timerInterval = setInterval(() => {
+          state.remainingSeconds -= 1;
+          lockoutTimerEl.textContent = formatMMSS(state.remainingSeconds);
+
+          /* RN-014-A: Cuando llega a 00:00, desbloquea automáticamente y reinicia intentos */
+          if (state.remainingSeconds <= 0) {
+            clearInterval(state.timerInterval);
+            state.timerInterval = null;
+            unlockTerminal();
+          }
+        }, 1000);
+      }
+
+      /* Desbloquea la terminal y reinicia contador de intentos a 0 (RN-014-A) */
+      function unlockTerminal() {
+        state.isLocked = false;
+        state.failedAttempts = 0;
+        state.remainingSeconds = 0;
+
+        lockoutBanner.classList.add('hidden');
+        setControlsDisabled(false);
+        showFeedback('success', 'Bloqueo temporal finalizado. Contador reiniciado a 0 intentos.');
+        pinInputs[0].focus();
+      }
+
+      /* Configuración de eventos de teclado y entrada en los 6 campos PIN */
+      pinInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+          if (state.isLocked) return;
+
+          // Solo permitir dígitos numéricos 0-9
+          const cleanVal = e.target.value.replace(/[^0-9]/g, '');
+          e.target.value = cleanVal.slice(-1);
+
+          if (e.target.value && index < pinInputs.length - 1) {
+            pinInputs[index + 1].focus();
+          }
+        });
+
+        input.addEventListener('keydown', (e) => {
+          if (state.isLocked) return;
+
+          if (e.key === 'Backspace') {
+            if (input.value === '' && index > 0) {
+              pinInputs[index - 1].value = '';
+              pinInputs[index - 1].focus();
+              e.preventDefault();
+            } else {
+              input.value = '';
+            }
+          } else if (e.key === 'ArrowLeft' && index > 0) {
+            pinInputs[index - 1].focus();
+          } else if (e.key === 'ArrowRight' && index < pinInputs.length - 1) {
+            pinInputs[index + 1].focus();
+          } else if (e.key === 'Enter') {
+            handleStartShift();
+          }
+        });
+
+        /* Soporte para pegar código de 6 dígitos completo */
+        input.addEventListener('paste', (e) => {
+          if (state.isLocked) return;
+          e.preventDefault();
+          try {
+            const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+            const digits = pastedData.replace(/[^0-9]/g, '').slice(0, 6);
+            if (digits.length > 0) {
+              digits.split('').forEach((digit, idx) => {
+                if (pinInputs[idx]) {
+                  pinInputs[idx].value = digit;
+                }
+              });
+              const nextFocusIdx = Math.min(digits.length, pinInputs.length - 1);
+              pinInputs[nextFocusIdx].focus();
+            }
+          } catch (err) {
+            // Manejo seguro si clipboardData no está disponible
+          }
+        });
+      });
+
+      /* Mostrar / Ocultar dígitos del PIN */
+      btnTogglePin.addEventListener('click', () => {
+        state.pinVisible = !state.pinVisible;
+        pinInputs.forEach(input => {
+          if (state.pinVisible) {
+            input.classList.remove('pin-masked');
+          } else {
+            input.classList.add('pin-masked');
+          }
+        });
+        btnTogglePin.textContent = state.pinVisible ? 'Ocultar' : 'Mostrar';
+      });
+
+      /* Simulación de Verificación Biométrica Nativa (Huella / Face ID) */
+      function setBiometricVerifiedUI(verified) {
+        state.biometricVerified = verified;
+        if (verified) {
+          btnBiometric.classList.remove(
+            'border-[#1E40AF]', 'text-[#1E40AF]', 'bg-blue-50/70', 'hover:bg-blue-100/80'
+          );
+          btnBiometric.classList.add(
+            'border-[#059669]', 'text-white', 'bg-[#059669]', 'hover:bg-emerald-700'
+          );
+          biometricBtnContent.innerHTML = '<span>✅ Biometría de Plataforma Verificada</span>';
+        } else {
+          btnBiometric.classList.remove(
+            'border-[#059669]', 'text-white', 'bg-[#059669]', 'hover:bg-emerald-700'
+          );
+          btnBiometric.classList.add(
+            'border-[#1E40AF]', 'text-[#1E40AF]', 'bg-blue-50/70', 'hover:bg-blue-100/80'
+          );
+          biometricBtnContent.innerHTML = '<span>👆 VALIDAR CON HUELLA / FACE ID</span>';
+        }
+      }
+
+      btnBiometric.addEventListener('click', () => {
+        if (state.isLocked || state.biometricVerified) return;
+
+        btnBiometric.disabled = true;
+        biometricBtnContent.innerHTML = `
+          <svg class="animate-spin h-4 w-4 text-[#1E40AF]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span>Verificando biometría nativa...</span>
+        `;
+
+        setTimeout(() => {
+          if (!state.isLocked) {
+            btnBiometric.disabled = false;
+            setBiometricVerifiedUI(true);
+            hideFeedback();
+          }
+        }, 750);
+      });
+
+      /* Transición a Pantalla de Éxito (Jornada Iniciada) */
+      function showSuccessScreen() {
+        state.failedAttempts = 0;
+        const nowUtc = new Date().toISOString();
+        generatedNtpEl.textContent = nowUtc;
+        generatedTokenEl.textContent = `eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.sup042_dev98a4f21c_${Date.now().toString(36)}.ttl12h`;
+
+        p002TransitionNotice.classList.add('hidden');
+        viewLogin.classList.add('hidden');
+        viewSuccess.classList.remove('hidden');
+      }
+
+      /* Validación Principal al presionar "INICIAR JORNADA" */
+      function handleStartShift() {
+        if (state.isLocked || state.isSubmitting) return;
+
+        const enteredPin = getPinValue();
+
+        // 1. Validar longitud del PIN (6 dígitos)
+        if (enteredPin.length < 6) {
+          showFeedback('warning', 'Ingrese los 6 dígitos de su PIN de seguridad.');
+          triggerPinShake();
+          const firstEmpty = pinInputs.find(inp => inp.value === '');
+          if (firstEmpty) firstEmpty.focus();
+          return;
+        }
+
+        // 2. Validar PIN correcto vs incorrecto (RN-014)
+        if (enteredPin !== VALID_PIN) {
+          state.failedAttempts += 1;
+          triggerPinShake();
+
+          if (state.failedAttempts >= MAX_ATTEMPTS) {
+            // Al 3er fallo dispara bloqueo temporal de 30 minutos
+            activateLockout(LOCKOUT_DURATION_SECONDS);
+          } else {
+            clearPinInputs(true);
+            showFeedback(
+              'error',
+              `PIN incorrecto. Intento ${state.failedAttempts} de ${MAX_ATTEMPTS}.`
+            );
+          }
+          return;
+        }
+
+        // 3. Validar verificación biométrica de plataforma (M-10 / RN-012)
+        if (!state.biometricVerified) {
+          showFeedback(
+            'warning',
+            'Complete la validación con Huella / Face ID antes de iniciar jornada.'
+          );
+          btnBiometric.focus();
+          return;
+        }
+
+        // 4. Ambos válidos -> Spinner "Validando credenciales..." y transición a éxito
+        state.isSubmitting = true;
+        hideFeedback();
+        setControlsDisabled(true);
+        startBtnContent.innerHTML = `
+          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span>Validando credenciales...</span>
+        `;
+
+        setTimeout(() => {
+          state.isSubmitting = false;
+          startBtnContent.textContent = 'INICIAR JORNADA';
+          setControlsDisabled(false);
+          showSuccessScreen();
+        }, 900);
+      }
+
+      btnStartShift.addEventListener('click', handleStartShift);
+
+      /* Botones de la vista de éxito */
+      document.getElementById('btn-go-p002').addEventListener('click', () => {
+        p002TransitionNotice.classList.remove('hidden');
+      });
+
+      document.getElementById('btn-copy-token').addEventListener('click', (e) => {
+        try {
+          const tempInput = document.createElement('textarea');
+          tempInput.value = generatedTokenEl.textContent.trim();
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand('copy');
+          document.body.removeChild(tempInput);
+
+          const btn = e.target;
+          btn.textContent = '¡Copiado!';
+          setTimeout(() => {
+            btn.textContent = 'Copiar';
+          }, 1500);
+        } catch (err) {
+          // Fallback silencioso
+        }
+      });
+
+      /* Reinicia completamente al Estado Inicial */
+      function resetToInitialState() {
+        if (state.timerInterval) {
+          clearInterval(state.timerInterval);
+          state.timerInterval = null;
+        }
+        state.failedAttempts = 0;
+        state.isLocked = false;
+        state.remainingSeconds = 0;
+        state.isSubmitting = false;
+
+        lockoutBanner.classList.add('hidden');
+        hideFeedback();
+        setBiometricVerifiedUI(false);
+        setControlsDisabled(false);
+        startBtnContent.textContent = 'INICIAR JORNADA';
+
+        viewSuccess.classList.add('hidden');
+        viewLogin.classList.remove('hidden');
+        clearPinInputs(true);
+      }
+
+      document.getElementById('btn-logout-reset').addEventListener('click', resetToInitialState);
+
+      /* =================================================================== */
+      /* CONTROLES DEL PANEL DE VALIDACIÓN QA / STAKEHOLDERS                 */
+      /* =================================================================== */
+
+      // 1. [Estado Inicial]
+      document.getElementById('qa-reset').addEventListener('click', resetToInitialState);
+
+      // 2. [Simular Fallo PIN]
+      document.getElementById('qa-fail-pin').addEventListener('click', () => {
+        if (!viewSuccess.classList.contains('hidden')) {
+          resetToInitialState();
+        }
+        if (state.isLocked) {
+          showFeedback('warning', 'La terminal ya se encuentra bloqueada (3/3 intentos).');
+          return;
+        }
+        // Rellena un PIN erróneo y dispara la validación
+        '000000'.split('').forEach((d, idx) => {
+          pinInputs[idx].value = d;
+        });
+        handleStartShift();
+      });
+
+      // 3. [Activar Bloqueo 30:00 (T-001)]
+      document.getElementById('qa-lock-30').addEventListener('click', () => {
+        viewSuccess.classList.add('hidden');
+        viewLogin.classList.remove('hidden');
+        activateLockout(LOCKOUT_DURATION_SECONDS);
+      });
+
+      // 4. [Adelantar Reloj a 00:05]
+      document.getElementById('qa-fast-forward').addEventListener('click', () => {
+        viewSuccess.classList.add('hidden');
+        viewLogin.classList.remove('hidden');
+        // Si no estaba bloqueado, activa el bloqueo directamente en 00:05 para observar el auto-desbloqueo
+        activateLockout(5);
+      });
+
+      // 5. [Simular Acceso Exitoso]
+      document.getElementById('qa-success').addEventListener('click', () => {
+        if (state.timerInterval) {
+          clearInterval(state.timerInterval);
+          state.timerInterval = null;
+        }
+        state.isLocked = false;
+        state.failedAttempts = 0;
+        lockoutBanner.classList.add('hidden');
+        hideFeedback();
+
+        VALID_PIN.split('').forEach((d, idx) => {
+          pinInputs[idx].value = d;
+        });
+        setBiometricVerifiedUI(true);
+        setControlsDisabled(false);
+
+        viewSuccess.classList.add('hidden');
+        viewLogin.classList.remove('hidden');
+        handleStartShift();
+      });
+    })();
+  </script>
+</body>
+</html>

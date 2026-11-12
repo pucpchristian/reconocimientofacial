@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-003 · Sincronización y Geocerca (Móvil)</title>
+  <style>
+    
+:root {
+  --primary: #1E40AF;
+  --primary-hover: #1D4ED8;
+  --primary-light: #DBEAFE;
+  --secondary: #059669;
+  --secondary-light: #D1FAE5;
+  --accent: #D97706;
+  --accent-light: #FEF3C7;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --text-main: #111827;
+  --text-muted: #4B5563;
+  --border: #D1D5DB;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-shell {
+  width: 100%;
+  max-width: 412px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.desktop-shell {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.app-header {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.app-header .subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.content-pad {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.card-muted {
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: #FFFFFF;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #047857;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-outline {
+  background-color: #FFFFFF;
+  color: var(--text-main);
+  border: 1.5px solid var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #F3F4F6;
+}
+
+.btn-ghost-light {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: var(--secondary-light);
+  color: #065F46;
+}
+
+.badge-warning {
+  background: var(--accent-light);
+  color: #92400E;
+}
+
+.badge-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+}
+
+.badge-primary {
+  background: var(--primary-light);
+  color: #1E3A8A;
+}
+
+.small-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.input-control, .select-control {
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-main);
+  background: #FFFFFF;
+  width: 100%;
+}
+
+.input-control:focus, .select-control:focus {
+  outline: 3px solid rgba(30, 64, 175, 0.25);
+  border-color: var(--primary);
+}
+
+.qa-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: #1F2937;
+  color: #F9FAFB;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-top: auto;
+}
+
+.qa-panel.mobile-qa {
+  max-width: 412px;
+}
+
+.qa-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #93C5FD;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qa-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qa-btn {
+  background: #374151;
+  color: #F9FAFB;
+  border: 1px solid #4B5563;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+}
+
+.qa-btn:hover {
+  background: #4B5563;
+}
+
+.qa-btn.active {
+  background: var(--primary);
+  border-color: #60A5FA;
+}
+
+.toast {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast-success {
+  background: var(--secondary-light);
+  color: #065F46;
+  border: 1px solid #6EE7B7;
+}
+
+.toast-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
+.toast-warning {
+  background: var(--accent-light);
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.hidden {
+  display: none !important;
+}
+
+    @keyframes blinkCritical {
+      0%, 100% { background-color: #DC2626; }
+      50% { background-color: #991B1B; }
+    }
+    .banner-critical {
+      background-color: #DC2626;
+      color: #FFFFFF;
+      padding: 14px 16px;
+      animation: blinkCritical 1.3s infinite ease-in-out;
+      border-bottom: 2px solid #7F1D1D;
+    }
+    .banner-amber {
+      background-color: #D97706;
+      color: #FFFFFF;
+      padding: 14px 16px;
+    }
+    .geofence-radar {
+      background: #EFF6FF;
+      border: 1.5px solid #BFDBFE;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .radar-circle {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 2px dashed var(--primary);
+      background: rgba(30, 64, 175, 0.08);
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radar-center {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+    .radar-user {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--secondary);
+      border: 2px solid #FFFFFF;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      transition: all 0.25s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="mobile-shell" aria-label="P-003 Sincronización y Geocerca">
+    <!-- Banner Superior Offline / Saturación (T-010 / RN-021-A / RN-005-G) -->
+    <div id="topBanner" class="banner-critical" role="alert">
+      <div style="font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:space-between;">
+        <span id="bannerHeader">🚨 ALERTA CRÍTICA DE SATURACIÓN</span>
+        <span id="bannerBadge" style="background:rgba(0,0,0,0.25); padding:2px 8px; border-radius:999px; font-size:11px;">81% CAP.</span>
+      </div>
+      <div id="bannerBody" style="font-size:13px; margin-top:4px;">
+        ⚠️ Almacenamiento local al 81 % (4,050/5,000). Uso: 162 MB / 200 MB. Conéctese a red para sync.
+      </div>
+      <button id="forceSyncBtn" class="btn btn-outline btn-full" style="margin-top:10px; min-height:48px; color:#111827;" onclick="simulateSync()">
+        🔄 FORZAR SINCRONIZACIÓN AHORA
+      </button>
+    </div>
+
+    <header class="app-header">
+      <button class="btn-ghost-light" onclick="showToast('warning', 'Volviendo a captura facial P-002.')">&lt; Volver</button>
+      <div style="text-align: right;">
+        <h1>Validación de Geocerca</h1>
+        <div class="subtitle">P-003 · Offline-First &amp; GPS</div>
+      </div>
+    </header>
+
+    <div class="content-pad">
+      <!-- Datos de Sede -->
+      <section class="card-muted">
+        <div style="font-weight:700; font-size:15px;">Sede: Planta Industrial Ate - Puerta 2</div>
+        <div class="small-text">Coordenadas: -12.046374, -77.042793 (WGS84 / EPSG:4326)</div>
+      </section>
+
+      <!-- Estado GPS & Geocerca 50m (RN-002 / RN-017) -->
+      <section class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-weight:700; font-size:15px;">Estado GPS (Radio 50 m)</span>
+          <span id="geoStatusBadge" class="badge badge-success">🟢 INSIDE_GEOFENCE</span>
+        </div>
+
+        <div class="geofence-radar">
+          <div class="radar-circle">
+            <div class="radar-center" title="Centroide Sede"></div>
+            <div class="radar-user" id="radarUserDot" title="Posición Operario"></div>
+          </div>
+          <div style="font-size:13px;">
+            <div>Precisión actual: <strong id="gpsAccText">12 m</strong> <span class="small-text">(Óptimo &le; 25 m)</span></div>
+            <div style="margin-top:4px;">Distancia Haversine: <strong id="gpsDistText">34.2 m</strong> <span class="small-text">(Máx. 50.01 m)</span></div>
+          </div>
+        </div>
+
+        <button id="recaptureBtn" class="btn btn-outline btn-full" style="margin-top:12px;" disabled onclick="handleRecapture()">
+          🔄 RE-CAPTURAR GPS (Intento 0 de 3)
+        </button>
+        <div class="small-text" style="text-align:center; margin-top:4px;">
+          Habilitado automáticamente cuando precisión &gt; 25 m (RN-002-A)
+        </div>
+      </section>
+
+      <!-- Cola Offline y NTP -->
+      <section class="card-muted">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:14px; font-weight:600;">📦 Cola Local Cifrada:</span>
+          <strong id="queueCountText" style="color:var(--danger);">4,050 pendientes</strong>
+        </div>
+        <div class="small-text" style="margin-top:4px;">
+          Última calibración NTP: Hace 2h 15m (Válida &le; 12h · RN-020)
+        </div>
+      </section>
+
+      <div id="p003Toast" class="toast" role="status"></div>
+
+      <!-- Confirmar -->
+      <button id="confirmMarkBtn" class="btn btn-primary btn-full" onclick="confirmAttendance()">
+        ✅ CONFIRMAR Y GUARDAR MARCACIÓN
+      </button>
+    </div>
+  </main>
+
+  <aside class="qa-panel mobile-qa">
+    <div class="qa-title">
+      <span>Panel QA · P-003 (Offline &amp; Geocerca)</span>
+      <span>T-010 / RN-021-A</span>
+    </div>
+    <div class="qa-buttons">
+      <button class="qa-btn active" onclick="setScenario81(this)">🚨 Saturación 81% (T-010)</button>
+      <button class="qa-btn" onclick="setScenarioAmber(this)">🟡 Banner Ámbar (15 pend.)</button>
+      <button class="qa-btn" onclick="setScenario100(this)">🛑 Bloqueo 100% (5,000)</button>
+      <button class="qa-btn" onclick="setScenarioOutside(this)">📍 Fuera Geocerca (68m)</button>
+      <button class="qa-btn" onclick="setScenarioUncertain(this)">📡 GPS Incierto (32m)</button>
+    </div>
+  </aside>
+
+  <script>
+    let retryCount = 0;
+    let isFullBlocked = false;
+    let geoState = 'INSIDE_GEOFENCE';
+
+    function setBtn(btn) {
+      document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function showToast(type, msg) {
+      const t = document.getElementById('p003Toast');
+      t.className = 'toast show toast-' + type;
+      t.textContent = msg;
+    }
+
+    function setScenario81(btn) {
+      setBtn(btn);
+      isFullBlocked = false;
+      geoState = 'INSIDE_GEOFENCE';
+      const banner = document.getElementById('topBanner');
+      banner.className = 'banner-critical';
+      document.getElementById('bannerHeader').textContent = '🚨 ALERTA CRÍTICA DE SATURACIÓN';
+      document.getElementById('bannerBadge').textContent = '81% CAP.';
+      document.getElementById('bannerBody').textContent = '⚠️ Almacenamiento local al 81 % (4,050/5,000). Uso: 162 MB / 200 MB. Conéctese a red para sync.';
+      document.getElementById('queueCountText').textContent = '4,050 pendientes';
+      document.getElementById('queueCountText').style.color = 'var(--danger)';
+
+      document.getElementById('geoStatusBadge').className = 'badge badge-success';
+      document.getElementById('geoStatusBadge').textContent = '🟢 INSIDE_GEOFENCE';
+      document.getElementById('gpsAccText').textContent = '12 m';
+      document.getElementById('gpsDistText').textContent = '34.2 m';
+      document.getElementById('radarUserDot').style.cssText = 'top:16px; right:16px; background:var(--secondary);';
+      document.getElementById('recaptureBtn').disabled = true;
+      document.getElementById('confirmMarkBtn').disabled = false;
+      document.getElementById('p003Toast').className = 'toast';
+    }
+
+    function setScenarioAmber(btn) {
+      setBtn(btn);
+      isFullBlocked = false;
+      const banner = document.getElementById('topBanner');
+      banner.className = 'banner-amber';
+      document.getElementById('bannerHeader').textContent = '🟡 MODO OFFLINE ACTIVO';
+      document.getElementById('bannerBadge').textContent = 'PENDING_SYNC';
+      document.getElementById('bannerBody').textContent = '15 marcaciones pendientes de sincronizar (1 <= N <= 100 · RN-005-G).';
+      document.getElementById('queueCountText').textContent = '15 pendientes';
+      document.getElementById('queueCountText').style.color = 'var(--accent)';
+      document.getElementById('confirmMarkBtn').disabled = false;
+      showToast('warning', 'Banner ámbar activo: sincronización automática en lote de 50 al detectar red.');
+    }
+
+    function setScenario100(btn) {
+      setBtn(btn);
+      isFullBlocked = true;
+      const banner = document.getElementById('topBanner');
+      banner.className = 'banner-critical';
+      document.getElementById('bannerHeader').textContent = '🛑 ALMACENAMIENTO LOCAL LLENO (100%)';
+      document.getElementById('bannerBadge').textContent = '5,000 / 5,000';
+      document.getElementById('bannerBody').textContent = 'Límite máximo alcanzado (RN-021). Nuevas capturas bloqueadas. Trasládese a zona con cobertura.';
+      document.getElementById('queueCountText').textContent = '5,000 pendientes (MÁX)';
+      document.getElementById('confirmMarkBtn').disabled = true;
+      showToast('danger', 'Bloqueo RN-021: No se permiten nuevas capturas hasta liberar espacio mediante sincronización.');
+    }
+
+    function setScenarioOutside(btn) {
+      setBtn(btn);
+      geoState = 'OUTSIDE_GEOFENCE';
+      document.getElementById('geoStatusBadge').className = 'badge badge-danger';
+      document.getElementById('geoStatusBadge').textContent = '🔴 OUTSIDE_GEOFENCE';
+      document.getElementById('gpsAccText').textContent = '9 m';
+      document.getElementById('gpsDistText').textContent = '68.5 m';
+      document.getElementById('radarUserDot').style.cssText = 'top:2px; right:2px; background:var(--danger);';
+      document.getElementById('recaptureBtn').disabled = true;
+      showToast('danger', 'Operario fuera del radio de 50 m (68.5 m). Se registrará alerta en Dashboard GPS.');
+    }
+
+    function setScenarioUncertain(btn) {
+      setBtn(btn);
+      retryCount = 0;
+      geoState = 'UNCERTAIN_GEOLOCATION';
+      document.getElementById('geoStatusBadge').className = 'badge badge-warning';
+      document.getElementById('geoStatusBadge').textContent = '🟡 UNCERTAIN_GEOLOCATION';
+      document.getElementById('gpsAccText').textContent = '32 m (> 25 m)';
+      document.getElementById('gpsDistText').textContent = '28.0 m';
+      const rBtn = document.getElementById('recaptureBtn');
+      rBtn.disabled = false;
+      rBtn.textContent = '🔄 RE-CAPTURAR GPS (Intento 0 de 3)';
+      showToast('warning', 'Precisión GPS insuficiente (> 25 m). Use RE-CAPTURAR GPS hasta 3 intentos (RN-002-A).');
+    }
+
+    function handleRecapture() {
+      retryCount++;
+      const rBtn = document.getElementById('recaptureBtn');
+      if (retryCount < 3) {
+        rBtn.textContent = `🔄 RE-CAPTURAR GPS (Intento ${retryCount} de 3)`;
+        showToast('warning', `Intento ${retryCount}/3 auditado (RN-002-C): gps_accuracy = 29 m (> 25 m).`);
+      } else {
+        rBtn.textContent = '⚠️ 3 Re-capturas agotadas';
+        rBtn.disabled = true;
+        geoState = 'REQUIRES_MANUAL_APPROVAL';
+        document.getElementById('geoStatusBadge').className = 'badge badge-warning';
+        document.getElementById('geoStatusBadge').textContent = '🟠 REQUIRES_MANUAL_APPROVAL';
+        showToast('warning', 'Tras 3 re-capturas > 25 m, derivado a REQUIRES_MANUAL_APPROVAL con foto adjunta (RN-002-B).');
+      }
+    }
+
+    function simulateSync() {
+      showToast('success', '🔄 Sincronizando en lotes de 50 con backoff exponencial (2s, 4s, 8s)... Cola reducida a 0 pendientes.');
+      isFullBlocked = false;
+      document.getElementById('confirmMarkBtn').disabled = false;
+      const banner = document.getElementById('topBanner');
+      banner.className = 'banner-amber';
+      banner.style.backgroundColor = 'var(--secondary)';
+      document.getElementById('bannerHeader').textContent = '✅ SINCRONIZACIÓN COMPLETADA';
+      document.getElementById('bannerBadge').textContent = '0% USO';
+      document.getElementById('bannerBody').textContent = 'Almacenamiento local liberado (0/5,000 registros · 0 MB / 200 MB).';
+      document.getElementById('queueCountText').textContent = '0 pendientes';
+      document.getElementById('queueCountText').style.color = 'var(--secondary)';
+    }
+
+    function confirmAttendance() {
+      if (isFullBlocked) return;
+      showToast('success', `✅ Marcación guardada localmente (AES-256) · Estado: ${geoState} · Idempotencia verificada.`);
+    }
+  </script>
+</body>
+</html>

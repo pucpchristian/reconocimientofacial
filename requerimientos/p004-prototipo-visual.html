@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>P-004 · Dashboard de Monitoreo GPS (Web)</title>
+  <style>
+    
+:root {
+  --primary: #1E40AF;
+  --primary-hover: #1D4ED8;
+  --primary-light: #DBEAFE;
+  --secondary: #059669;
+  --secondary-light: #D1FAE5;
+  --accent: #D97706;
+  --accent-light: #FEF3C7;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --text-main: #111827;
+  --text-muted: #4B5563;
+  --border: #D1D5DB;
+  --radius: 12px;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 16px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mobile-shell {
+  width: 100%;
+  max-width: 412px;
+  background: var(--surface);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.desktop-shell {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.app-header {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.app-header .subtitle {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.content-pad {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.card-muted {
+  background: #F9FAFB;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+.btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: #FFFFFF;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #047857;
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-outline {
+  background-color: #FFFFFF;
+  color: var(--text-main);
+  border: 1.5px solid var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #F3F4F6;
+}
+
+.btn-ghost-light {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: var(--secondary-light);
+  color: #065F46;
+}
+
+.badge-warning {
+  background: var(--accent-light);
+  color: #92400E;
+}
+
+.badge-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+}
+
+.badge-primary {
+  background: var(--primary-light);
+  color: #1E3A8A;
+}
+
+.small-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.input-control, .select-control {
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text-main);
+  background: #FFFFFF;
+  width: 100%;
+}
+
+.input-control:focus, .select-control:focus {
+  outline: 3px solid rgba(30, 64, 175, 0.25);
+  border-color: var(--primary);
+}
+
+.qa-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: #1F2937;
+  color: #F9FAFB;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-top: auto;
+}
+
+.qa-panel.mobile-qa {
+  max-width: 412px;
+}
+
+.qa-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #93C5FD;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qa-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qa-btn {
+  background: #374151;
+  color: #F9FAFB;
+  border: 1px solid #4B5563;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 38px;
+}
+
+.qa-btn:hover {
+  background: #4B5563;
+}
+
+.qa-btn.active {
+  background: var(--primary);
+  border-color: #60A5FA;
+}
+
+.toast {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+}
+
+.toast.show {
+  display: block;
+}
+
+.toast-success {
+  background: var(--secondary-light);
+  color: #065F46;
+  border: 1px solid #6EE7B7;
+}
+
+.toast-danger {
+  background: var(--danger-light);
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
+.toast-warning {
+  background: var(--accent-light);
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+
+.hidden {
+  display: none !important;
+}
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 16px 20px;
+      background: #F9FAFB;
+      border-bottom: 1px solid var(--border);
+      align-items: end;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      min-height: 460px;
+    }
+    @media (max-width: 860px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .alerts-sidebar {
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .alert-item {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .alert-item:hover, .alert-item.selected {
+      border-color: var(--primary);
+      background: #EFF6FF;
+    }
+    .map-canvas {
+      position: relative;
+      background-color: #E5E7EB;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.6) 2px, transparent 2px),
+        linear-gradient(to bottom, rgba(255,255,255,0.6) 2px, transparent 2px),
+        radial-gradient(circle at 50% 50%, #DBEAFE 0%, #E5E7EB 75%);
+      background-size: 60px 60px, 60px 60px, 100% 100%;
+      overflow: hidden;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .geofence-ring {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 3px dashed var(--primary);
+      background: rgba(30, 64, 175, 0.1);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease;
+    }
+    .site-hub {
+      background: var(--primary);
+      color: #FFFFFF;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      z-index: 3;
+    }
+    .map-pin {
+      position: absolute;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s;
+      z-index: 4;
+      white-space: nowrap;
+    }
+    .map-pin:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+    }
+    .pin-green {
+      background: var(--secondary);
+      border: 2px solid #FFFFFF;
+    }
+    .pin-red {
+      background: var(--danger);
+      border: 2px solid #FFFFFF;
+    }
+    .map-controls {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+    .audit-footer {
+      background: #111827;
+      color: #F9FAFB;
+      padding: 12px 20px;
+      font-size: 13px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="desktop-shell" aria-label="P-004 Dashboard de Monitoreo GPS">
+    <header class="app-header">
+      <div>
+        <h1>RH Omnicanal · Monitor GPS en Vivo</h1>
+        <div class="subtitle">P-004 · Visualización Geodésica WGS84 sin Login Tradicional (RN-007)</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span id="tokenBadge" class="badge badge-success" style="font-size:13px; padding:6px 12px;">
+          🔑 Sesión Token: Activa (TTL 11h 40m)
+        </span>
+      </div>
+    </header>
+
+    <!-- Estado Token Expirado HTTP 401 (Oculto por defecto) -->
+    <section id="expiredView" class="content-pad hidden" style="text-align:center; padding:48px 20px;">
+      <div style="font-size:42px;">🔒</div>
+      <h2 style="font-size:22px; color:var(--danger);">HTTP 401 · Token de Sesión Expirado (&gt; 12 h)</h2>
+      <p style="max-width:520px; margin:0 auto; color:var(--text-muted);">
+        Por política constitucional (PRINCIPIO-002 / RN-007), este dashboard no utiliza formulario usuario/contraseña. Solicite un nuevo enlace firmado desde su canal corporativo privilegiado.
+      </p>
+      <div style="margin-top:12px;">
+        <button class="btn btn-primary" onclick="restoreDashboard()">🔄 Simular Renovación de Token</button>
+      </div>
+    </section>
+
+    <!-- Vista Principal Dashboard -->
+    <div id="mainDashboardView">
+      <section class="filter-bar" aria-label="Filtros de monitoreo">
+        <div>
+          <label class="small-text" for="siteFilter">Sede Operativa</label>
+          <select id="siteFilter" class="select-control" onchange="applyFilters()">
+            <option value="ALL">Todas las Sedes</option>
+            <option value="Almacén Lurín">Almacén Lurín</option>
+            <option value="Planta Ate">Planta Ate</option>
+          </select>
+        </div>
+        <div>
+          <label class="small-text" for="dateFilter">Fecha Operativa</label>
+          <input id="dateFilter" type="text" class="input-control" value="12/11/2026" readonly />
+        </div>
+        <div>
+          <label class="small-text" for="workerSearch">Trabajador</label>
+          <input id="workerSearch" type="text" class="input-control" placeholder="Buscar nombre..." oninput="applyFilters()" />
+        </div>
+        <div>
+          <label class="small-text" for="statusFilter">Estado Geocerca</label>
+          <select id="statusFilter" class="select-control" onchange="applyFilters()">
+            <option value="ALL">Todos los Estados</option>
+            <option value="OUTSIDE_GEOFENCE">🔴 Fuera de Geocerca</option>
+            <option value="INSIDE_GEOFENCE">🟢 Dentro de Geocerca</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn btn-primary btn-full" onclick="applyFilters()">🔍 Filtrar (p95 &le; 1.5s)</button>
+        </div>
+      </section>
+
+      <div class="dashboard-grid">
+        <!-- Sidebar Marcaciones -->
+        <aside class="alerts-sidebar" id="recordsList" aria-label="Listado de marcaciones"></aside>
+
+        <!-- Mapa Interactivo -->
+        <section class="map-canvas" id="mapCanvas" aria-label="Mapa interactivo con radio de 50 metros">
+          <div style="position:absolute; top:14px; left:14px; background:#FFFFFF; padding:6px 12px; border-radius:8px; font-size:12px; font-weight:600; box-shadow:var(--shadow);">
+            Radio Geocerca Fijo: <strong>50.00 m</strong> (Haversine) · Latencia: <span style="color:var(--secondary);">410 ms</span>
+          </div>
+
+          <div class="geofence-ring" id="geofenceRing">
+            <div class="site-hub" id="hubLabel">📍 Almacén Lurín (50m)</div>
+            <div id="pinsContainer"></div>
+          </div>
+
+          <div class="map-controls">
+            <button class="btn btn-outline" style="min-height:40px; padding:6px 12px;" onclick="zoomMap(1.15)">➕</button>
+            <button class="btn btn-outline" style="min-height:40px; padding:6px 12px;" onclick="zoomMap(0.88)">➖</button>
+            <button class="btn btn-outline" style="min-height:40px; padding:6px 12px;" onclick="toggleLayer()">🛰️ Capa: Mapa/Satélite</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Barra de Detalle Auditable (RN-016) -->
+      <footer class="audit-footer" id="auditDetailBar">
+        <span><strong>Selección:</strong> Juan Pérez (DNI: ***45)</span>
+        <span><strong>Estado:</strong> 🔴 OUTSIDE_GEOFENCE (78.4 m)</span>
+        <span><strong>Precisión GPS:</strong> 8 m</span>
+        <span><strong>Device UUID:</strong> dev-98a4-f21c</span>
+        <span><strong>UTC:</strong> 2026-11-12T08:02:15.000Z</span>
+      </footer>
+    </div>
+  </main>
+
+  <aside class="qa-panel" aria-label="Panel QA Dashboard">
+    <div class="qa-title">
+      <span>Panel QA · P-004 (Dashboard GPS Web)</span>
+      <span>RN-007 / RN-008 / RN-013</span>
+    </div>
+    <div class="qa-buttons">
+      <button class="qa-btn active" onclick="resetDashboard(this)">🗺️ Todos los Pines (4)</button>
+      <button class="qa-btn" onclick="filterOnlyAlerts(this)">🔴 Solo Fuera Geocerca (2)</button>
+      <button class="qa-btn" onclick="simulateEmptyState(this)">📭 Estado Vacío (HU-018)</button>
+      <button class="qa-btn" onclick="simulateTokenExpired(this)">🔒 Simular Token Expirado (401)</button>
+    </div>
+  </aside>
+
+  <script>
+    const mockRecords = [
+      { id: 1, name: 'Juan Pérez', dni: '***45', site: 'Almacén Lurín', dist: '78.4 m', status: 'OUTSIDE_GEOFENCE', acc: '8 m', device: 'dev-98a4-f21c', time: '08:02:15 UTC', x: '115%', y: '15%' },
+      { id: 2, name: 'Luis Gómez', dni: '***12', site: 'Planta Ate', dist: '112.0 m', status: 'OUTSIDE_GEOFENCE', acc: '11 m', device: 'dev-4410-b19e', time: '08:05:40 UTC', x: '-18%', y: '88%' },
+      { id: 3, name: 'María Torres', dni: '***89', site: 'Almacén Lurín', dist: '18.5 m', status: 'INSIDE_GEOFENCE', acc: '6 m', device: 'dev-98a4-f21c', time: '07:58:10 UTC', x: '32%', y: '34%' },
+      { id: 4, name: 'Carlos Mendoza', dni: '***73', site: 'Planta Ate', dist: '34.2 m', status: 'INSIDE_GEOFENCE', acc: '12 m', device: 'dev-4410-b19e', time: '08:00:02 UTC', x: '68%', y: '66%' }
+    ];
+
+    let selectedId = 1;
+    let scale = 1;
+    let isSatellite = false;
+
+    function setActiveBtn(btn) {
+      document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function renderRecords(list) {
+      const sidebar = document.getElementById('recordsList');
+      const pins = document.getElementById('pinsContainer');
+      sidebar.innerHTML = '';
+      pins.innerHTML = '';
+
+      if (list.length === 0) {
+        sidebar.innerHTML = `
+          <div class="card-muted" style="text-align:center; padding:24px 12px;">
+            <div style="font-size:28px;">✅</div>
+            <div style="font-weight:700; margin-top:6px;">Sin marcaciones fuera de geocerca</div>
+            <div class="small-text">No hay registros que coincidan con los filtros aplicados (HU-018).</div>
+          </div>`;
+        return;
+      }
+
+      list.forEach(rec => {
+        const isOut = rec.status === 'OUTSIDE_GEOFENCE';
+        const card = document.createElement('div');
+        card.className = 'alert-item' + (rec.id === selectedId ? ' selected' : '');
+        card.onclick = () => selectRecord(rec, list);
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${isOut ? '🔴' : '🟢'} ${rec.name}</strong>
+            <span class="small-text">${rec.time}</span>
+          </div>
+          <div style="font-size:13px; margin-top:4px;">
+            Dist: <strong>${rec.dist}</strong> (${rec.status})
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <span class="small-text">Sede: ${rec.site}</span>
+            <span style="font-size:12px; font-weight:700; color:var(--primary);">[ Ver en Mapa ]</span>
+          </div>
+        `;
+        sidebar.appendChild(card);
+
+        const pin = document.createElement('div');
+        pin.className = 'map-pin ' + (isOut ? 'pin-red' : 'pin-green');
+        pin.style.left = rec.x;
+        pin.style.top = rec.y;
+        pin.textContent = `${isOut ? '🔴' : '🟢'} ${rec.name.split(' ')[0]} (${rec.dist})`;
+        pin.onclick = (e) => {
+          e.stopPropagation();
+          selectRecord(rec, list);
+        };
+        pins.appendChild(pin);
+      });
+    }
+
+    function selectRecord(rec, currentList) {
+      selectedId = rec.id;
+      document.getElementById('hubLabel').textContent = `📍 ${rec.site} (50m)`;
+      const isOut = rec.status === 'OUTSIDE_GEOFENCE';
+      document.getElementById('auditDetailBar').innerHTML = `
+        <span><strong>Selección:</strong> ${rec.name} (DNI: ${rec.dni})</span>
+        <span><strong>Estado:</strong> ${isOut ? '🔴' : '🟢'} ${rec.status} (${rec.dist})</span>
+        <span><strong>Precisión GPS:</strong> ${rec.acc}</span>
+        <span><strong>Device UUID:</strong> ${rec.device}</span>
+        <span><strong>UTC:</strong> 2026-11-12T${rec.time.replace(' UTC', '.000Z')}</span>
+      `;
+      renderRecords(currentList);
+    }
+
+    function applyFilters() {
+      const site = document.getElementById('siteFilter').value;
+      const status = document.getElementById('statusFilter').value;
+      const query = document.getElementById('workerSearch').value.toLowerCase();
+
+      const filtered = mockRecords.filter(r => {
+        const matchSite = site === 'ALL' || r.site === site;
+        const matchStatus = status === 'ALL' || r.status === status;
+        const matchName = r.name.toLowerCase().includes(query);
+        return matchSite && matchStatus && matchName;
+      });
+      renderRecords(filtered);
+    }
+
+    function zoomMap(factor) {
+      scale = Math.min(1.5, Math.max(0.7, scale * factor));
+      document.getElementById('geofenceRing').style.transform = `scale(${scale})`;
+    }
+
+    function toggleLayer() {
+      isSatellite = !isSatellite;
+      const canvas = document.getElementById('mapCanvas');
+      canvas.style.backgroundColor = isSatellite ? '#1E293B' : '#E5E7EB';
+    }
+
+    function resetDashboard(btn) {
+      setActiveBtn(btn);
+      restoreDashboard();
+      document.getElementById('siteFilter').value = 'ALL';
+      document.getElementById('statusFilter').value = 'ALL';
+      document.getElementById('workerSearch').value = '';
+      applyFilters();
+    }
+
+    function filterOnlyAlerts(btn) {
+      setActiveBtn(btn);
+      restoreDashboard();
+      document.getElementById('statusFilter').value = 'OUTSIDE_GEOFENCE';
+      applyFilters();
+    }
+
+    function simulateEmptyState(btn) {
+      setActiveBtn(btn);
+      restoreDashboard();
+      document.getElementById('workerSearch').value = 'Trabajador Inexistente';
+      applyFilters();
+    }
+
+    function simulateTokenExpired(btn) {
+      setActiveBtn(btn);
+      document.getElementById('mainDashboardView').classList.add('hidden');
+      document.getElementById('expiredView').classList.remove('hidden');
+      const tb = document.getElementById('tokenBadge');
+      tb.className = 'badge badge-danger';
+      tb.textContent = '🔒 Sesión Token: Expirado (HTTP 401)';
+    }
+
+    function restoreDashboard() {
+      document.getElementById('expiredView').classList.add('hidden');
+      document.getElementById('mainDashboardView').classList.remove('hidden');
+      const tb = document.getElementById('tokenBadge');
+      tb.className = 'badge badge-success';
+      tb.textContent = '🔑 Sesión Token: Activa (TTL 11h 40m)';
+    }
+
+    applyFilters();
+  </script>
+</body>
+</html>
